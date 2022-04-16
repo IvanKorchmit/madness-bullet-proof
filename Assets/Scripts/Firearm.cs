@@ -28,9 +28,7 @@ public class Firearm : WeaponBase
         {
             ang = 360 + ang;
         }
-        float oldAng = ang;
         ang = owner.IsMoving ? BestFitAngle(ang) : ang;
-        Debug.Log(ang + " " + oldAng + " " + owner.IsMoving);
         return ang;
     }
 
