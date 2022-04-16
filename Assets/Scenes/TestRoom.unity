@@ -362,7 +362,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: bd3cb4af8406d4436a2ae8c2aafe1f8d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c02cce416a51f294fa87384b5ab264fb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -468,7 +468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c26c39cb809ea143a01fc96cb0e7a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parallaxModifier: {x: 0.05, y: 0.05}
+  parallaxModifier: {x: 0.9, y: 0.9}
   movement: {x: 5, y: -3.25}
   infiniteOnYAxis: 1
 --- !u!1 &272860854
@@ -545,7 +545,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b151edcc20860e45bf9bdd7abbd3889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 8
+  speed: 0.01
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -620,7 +620,7 @@ MonoBehaviour:
   m_RefResolutionX: 320
   m_RefResolutionY: 180
   m_UpscaleRT: 0
-  m_PixelSnapping: 1
+  m_PixelSnapping: 0
   m_CropFrameX: 0
   m_CropFrameY: 0
   m_StretchFill: 0
@@ -819,7 +819,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 891582401}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.0198765, y: -2.433721, z: -1.0223699}
+  m_LocalPosition: {x: -1.98, y: -0.84, z: -1.0223699}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 101494345}
@@ -856,6 +856,9 @@ MonoBehaviour:
   OnJumpEvent:
     m_PersistentCalls:
       m_Calls: []
+  OnDoubleJumpEvent:
+    m_PersistentCalls:
+      m_Calls: []
   OnCrouchEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -873,9 +876,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   landSound: {fileID: 8300000, guid: 8c7ddf9c733054842b1b0e6c602c2411, type: 3}
   jumpSound: {fileID: 8300000, guid: 922906987733a2e418cb0ff4e8b43914, type: 3}
-  currentWeapon: {fileID: 11400000, guid: f93022dd1fd283e40a5add2fe40e45bd, type: 2}
+  currentWeapon: {fileID: 11400000, guid: badfab0161ea52e45985f7c0fcf6f734, type: 2}
   speed: 1
   health: 10
+  doublJumpSound: {fileID: 8300000, guid: bdea68639dfd5654a93b7a60c5c10cd0, type: 3}
 --- !u!50 &891582406
 Rigidbody2D:
   serializedVersion: 4
@@ -892,7 +896,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 2
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 1a416c2a9e3f6ae4da5c3273d008f01b, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -1257,7 +1261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c26c39cb809ea143a01fc96cb0e7a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parallaxModifier: {x: 0.1875, y: 0}
+  parallaxModifier: {x: 0.6, y: 0}
   movement: {x: 0, y: 0}
   infiniteOnYAxis: 0
 --- !u!212 &1315423404
@@ -1452,7 +1456,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parallaxModifier: {x: 0.33333, y: 0.3333}
-  movement: {x: 10, y: -3.25}
+  movement: {x: 10, y: -2}
   infiniteOnYAxis: 1
 --- !u!212 &1702275559
 SpriteRenderer:
@@ -1535,7 +1539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c26c39cb809ea143a01fc96cb0e7a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parallaxModifier: {x: 0.5, y: 0.1}
+  parallaxModifier: {x: 0.5, y: 0.6}
   movement: {x: 0, y: 0}
   infiniteOnYAxis: 0
 --- !u!212 &1770119909

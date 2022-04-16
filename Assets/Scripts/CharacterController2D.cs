@@ -11,7 +11,7 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private Transform m_GroundCheck;                           // A position marking where to check if the player is grounded.
 	[SerializeField] private Transform m_CeilingCheck;                          // A position marking where to check for ceilings
 	[SerializeField] private Collider2D m_CrouchDisableCollider;                // A collider that will be disabled when crouching
-
+	private bool alreadyPerformedDoubleJump;
 	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
 	private bool m_Grounded;            // Whether or not the player is grounded.
 	const float k_CeilingRadius = .2f; // Radius of the overlap circle to determine if the player can stand up
@@ -30,6 +30,7 @@ public class CharacterController2D : MonoBehaviour
 
 	public UnityEvent OnLandEvent;
 	public UnityEvent OnJumpEvent;
+	public UnityEvent OnDoubleJumpEvent;
 
 	[System.Serializable]
 	public class BoolEvent : UnityEvent<bool> { }
@@ -48,6 +49,8 @@ public class CharacterController2D : MonoBehaviour
 			OnCrouchEvent = new BoolEvent();
 		if (OnJumpEvent == null)
 			OnJumpEvent = new UnityEvent();
+		if (OnDoubleJumpEvent == null)
+			OnDoubleJumpEvent = new UnityEvent();
 	}
 
 	private void FixedUpdate()
@@ -63,6 +66,7 @@ public class CharacterController2D : MonoBehaviour
             if (colliders[i].gameObject != gameObject && m_Rigidbody2D.velocity.y == 0)
 			{
 				m_Grounded = true;
+				alreadyPerformedDoubleJump = false;
 				if (!wasGrounded)
 					OnLandEvent.Invoke();
 				break;
@@ -80,7 +84,6 @@ public class CharacterController2D : MonoBehaviour
 				crouch = true;
 			}
 		}
-
 		//only control the player if grounded or airControl is turned on
 		if (m_Grounded || m_AirControl)
 		{
@@ -139,6 +142,13 @@ public class CharacterController2D : MonoBehaviour
 			m_Grounded = false;
 			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 			OnJumpEvent?.Invoke();
+		}
+		else if (!m_Grounded && !alreadyPerformedDoubleJump && jump)
+        {
+			m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x, 0);
+			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce * 0.8f));
+			alreadyPerformedDoubleJump = true;
+			OnDoubleJumpEvent?.Invoke();
 		}
 	}
 

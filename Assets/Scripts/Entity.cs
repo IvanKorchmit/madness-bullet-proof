@@ -17,6 +17,8 @@ public class Entity : MonoBehaviour, IDamagable
     #endregion
     #region Movement
     #region Properties
+    protected CharacterController2D Controller => controller;
+    protected AudioSource Audio => audioSource;
     [SerializeField] private float speed;
     private bool isJumping;
     #region States
@@ -25,7 +27,6 @@ public class Entity : MonoBehaviour, IDamagable
     #endregion
     private Vector2 movement;
     private bool crounch;
-    private bool cooldownJump;
     #endregion
     #region Components
     private CharacterController2D controller;
@@ -40,7 +41,7 @@ public class Entity : MonoBehaviour, IDamagable
         controller.OnJumpEvent.AddListener(Entity_onEntityJump);
         onEntityAttack += Entity_onEntityAttack;
     }
-
+    #region Event Subscriptions
     private void Entity_onEntityAttack()
     {
         audioSource.PlayOneShot(currentWeapon.ShootSound);
@@ -60,13 +61,14 @@ public class Entity : MonoBehaviour, IDamagable
 
     protected virtual void Update()
     {
-    }
-    protected virtual void FixedUpdate()
-    {
         if (!isKnockedOut)
         {
-            controller.Move(movement.x * speed, crounch, isJumping && cooldownJump);
+            controller.Move(movement.x * speed, crounch, isJumping);
         }
+    }
+    #endregion
+    protected virtual void FixedUpdate()
+    {
     }
     #endregion
     #region Movement Methods
@@ -83,13 +85,11 @@ public class Entity : MonoBehaviour, IDamagable
     /// </summary>
     protected void Jump(bool isTrue)
     {
-        if (!cooldownJump && isTrue && controller.IsGrounded)
+        if (isTrue && controller.IsGrounded)
         {
             onEntityJump?.Invoke();
         }
         isJumping = isTrue;
-        cooldownJump = true;
-        TimerUtils.AddTimer(0.002f, ResetJump);
     }
     protected void Attack()
     {
@@ -116,10 +116,6 @@ public class Entity : MonoBehaviour, IDamagable
     public void Crounch(bool isTrue)
     {
         crounch = isTrue;
-    }
-    private void ResetJump()
-    {
-        cooldownJump = false;
     }
     #endregion
     [SerializeField] private int health = 10;

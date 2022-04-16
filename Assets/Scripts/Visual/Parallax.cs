@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Parallax : MonoBehaviour
 {
-    public const float PPU = 16;
     private Transform cam;
     private Vector2 lastCamPos;
     [SerializeField] private Vector2 parallaxModifier;
@@ -19,12 +18,12 @@ public class Parallax : MonoBehaviour
         Texture2D spriteTex = sprite.texture;
         textureUnitSize.x = spriteTex.width / sprite.pixelsPerUnit;
         textureUnitSize.y = spriteTex.height / sprite.pixelsPerUnit;
+        parallaxModifier = PixelPerfectUtils.SnapVectorToPixel(parallaxModifier, PixelPerfectUtils.PIXELS_PER_UNIT);
     }
     private void LateUpdate()
     {
         Vector2 deltaPosition = (Vector2)cam.position - lastCamPos;
         transform.position += (Vector3)(deltaPosition * parallaxModifier);
-        transform.position += (Vector3)movement * Time.deltaTime;
 
 
         lastCamPos = cam.position;
@@ -38,6 +37,7 @@ public class Parallax : MonoBehaviour
             float offset = (cam.position.y - transform.position.y) % textureUnitSize.y;
             transform.position = new Vector3(transform.position.x, cam.position.y + offset);
         }
-        transform.position = PixelPerfectUtils.SnapToPixel(transform.position, 16);
+        transform.position += (Vector3)movement * PixelPerfectUtils.SnapFloatToPixel(Time.deltaTime, PixelPerfectUtils.PIXELS_PER_UNIT);
+        transform.position = PixelPerfectUtils.SnapVectorToPixel(transform.position, 16);
     }
 }
