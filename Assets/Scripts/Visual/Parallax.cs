@@ -37,7 +37,6 @@ public class Parallax : MonoBehaviour
             float offset = (cam.position.y - transform.position.y) % textureUnitSize.y;
             transform.position = new Vector3(transform.position.x, cam.position.y + offset);
         }
-        transform.position += (Vector3)movement * PixelPerfectUtils.SnapFloatToPixel(Time.deltaTime, PixelPerfectUtils.PIXELS_PER_UNIT);
-        transform.position = PixelPerfectUtils.SnapVectorToPixel(transform.position, 16);
+        transform.position += (Vector3)movement * Time.deltaTime;
     }
 }

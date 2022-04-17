@@ -12,6 +12,7 @@ public class PlayerFollow : MonoBehaviour
         Player.Singleton.onEntityLand += Player_onPlayerJumpOrLand;
         Player.Singleton.onEntityJump += Player_onPlayerJumpOrLand;
         Player.Singleton.onEntityAttack += Player_onPlayerAttack;
+        Player.Singleton.onEntityPunch += Player_onPlayerAttack;
         lastPlayerPosition = Player.Singleton.transform.position;
     }
 
@@ -26,16 +27,16 @@ public class PlayerFollow : MonoBehaviour
     }
     private void LateUpdate()
     {
+        if (Player.Singleton == null) return;
         Vector2 deltaPosition = (Vector2)Player.Singleton.transform.position - lastPlayerPosition;
         lastPlayerPosition = Player.Singleton.transform.position;
 
-        if (Vector2.Distance((Vector2)Player.Singleton.transform.position + deltaPosition, transform.position) < maxDistance)
+        if (Vector2.Distance((Vector2)Player.Singleton.transform.position + deltaPosition, transform.position) < maxDistance || deltaPosition == Vector2.zero)
         {
             float z = transform.position.z;
             transform.position = Vector2.Lerp(transform.position, Player.Singleton.transform.position, Time.deltaTime * speed);
-            transform.position = PixelPerfectUtils.SnapVectorToPixel(transform.position, 16);
             transform.position = new Vector3(transform.position.x, transform.position.y, z);
-        }
+        }   
         else
         {
             transform.position += (Vector3)deltaPosition;

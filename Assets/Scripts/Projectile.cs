@@ -40,9 +40,13 @@ public class Projectile : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (owner.gameObject != collision.gameObject && collision.TryGetComponent(out IDamagable damage))
+
+        bool ignore = (owner as Enemy) != null && collision.GetComponent<Entity>() is Enemy;
+
+
+        if (!ignore && owner != null && owner.gameObject != collision.gameObject && collision.TryGetComponent(out IDamagable damage))
         {
-            damage.Damage(Player.Singleton, 1);
+            damage.Damage(owner, 1);
             Destroy(gameObject);
         }
     }
@@ -50,4 +54,4 @@ public class Projectile : MonoBehaviour
     {
         time += Time.deltaTime;
     }
-}   
+}
