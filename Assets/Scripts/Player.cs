@@ -17,6 +17,7 @@ public class Player : Entity
     private void OnPlayerDoubleJump()
     {
         Audio.PlayOneShot(doublJumpSound);
+        EntityAnimator.SetTrigger(JUMP_TRIGGER);
     }
 
     protected override void Update()
@@ -26,7 +27,7 @@ public class Player : Entity
         Jump(Input.GetKeyDown(KeyCode.Space));
         Crounch(Input.GetKey(KeyCode.LeftShift));
         Aim(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
-        if (Input.GetKey(KeyCode.Return)) Attack();
+        if (Input.GetKey(KeyCode.Return)) Attack(Input.GetKeyDown(KeyCode.Return));
     }
     protected override void FixedUpdate()
     {

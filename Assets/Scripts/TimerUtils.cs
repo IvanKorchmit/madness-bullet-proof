@@ -84,6 +84,13 @@ public class TimerUtils : MonoBehaviour
     }
     public static void Cancel(Action action)
     {
-        timer.RemoveAll((m) => m.isSame(action, 0, false));
+        try
+        {
+            timer.RemoveAll((m) => m.isSame(action, 0, false));
+        }
+        catch
+        {
+            return;
+        }
     }
 }

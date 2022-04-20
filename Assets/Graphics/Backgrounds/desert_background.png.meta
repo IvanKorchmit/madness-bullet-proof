@@ -1,19 +1,22 @@
 fileFormatVersion: 2
-guid: f24beaf250f41674187535c75c40caff
+guid: 5d42211e1d4215f4d8ccdbbe2ccd07b5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1974896369226778980
-    second: Bg1_
+      213: 1155137187093371521
+    second: Sky
   - first:
-      213: 1579983390758274104
-    second: Bg1_1
+      213: -6991364253550980713
+    second: Clouds_1
   - first:
-      213: 3392311608574135850
-    second: Bg1_2
+      213: 253150716359569876
+    second: Clouds_2
   - first:
-      213: 8282585574986183904
-    second: Bg1_4
+      213: 5619853864906316736
+    second: Mountains
+  - first:
+      213: 8436189491332438052
+    second: Desert_Foreground
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -47,15 +50,15 @@ TextureImporter:
     filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
@@ -115,13 +118,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bg1_
+      name: Sky
       rect:
         serializedVersion: 2
         x: 0
-        y: 300
-        width: 100
-        height: 100
+        y: 1024
+        width: 512
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -129,20 +132,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c9677043732c794e0800000000000000
-      internalID: -1974896369226778980
+      spriteID: 18a5b87c62fd70010800000000000000
+      internalID: 1155137187093371521
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Bg1_1
+      name: Clouds_1
       rect:
         serializedVersion: 2
         x: 0
-        y: 200
-        width: 100
-        height: 100
+        y: 768
+        width: 512
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,20 +153,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8340a25d58a3de510800000000000000
-      internalID: 1579983390758274104
+      spriteID: 791dab3d04fa9fe90800000000000000
+      internalID: -6991364253550980713
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Bg1_2
+      name: Clouds_2
       rect:
         serializedVersion: 2
         x: 0
-        y: 100
-        width: 100
-        height: 100
+        y: 512
+        width: 512
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -171,20 +174,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a2ece7c4f69e31f20800000000000000
-      internalID: 3392311608574135850
+      spriteID: 4d17f3b3c3f538300800000000000000
+      internalID: 253150716359569876
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Bg1_4
+      name: Mountains
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 512
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0cbd85b905bbdfd40800000000000000
+      internalID: 5619853864906316736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Desert_Foreground
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 100
-        height: 100
+        width: 512
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -192,8 +216,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0e473da82b7a1f270800000000000000
-      internalID: 8282585574986183904
+      spriteID: 428d0c045ad531570800000000000000
+      internalID: 8436189491332438052
       vertices: []
       indices: 
       edges: []

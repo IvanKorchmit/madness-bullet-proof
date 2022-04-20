@@ -20,6 +20,8 @@ public class CharacterController2D : MonoBehaviour
 	private Vector3 m_Velocity = Vector3.zero;
 
 
+	private SpriteRenderer visuals;
+
 	private Vector2 lastPosition;
 
 
@@ -37,8 +39,11 @@ public class CharacterController2D : MonoBehaviour
 
 	public BoolEvent OnCrouchEvent;
 	private bool m_wasCrouching = false;
-
-	private void Awake()
+    private void Start()
+    {
+		visuals = GetComponentInChildren<SpriteRenderer>();
+    }
+    private void Awake()
 	{
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
@@ -62,17 +67,18 @@ public class CharacterController2D : MonoBehaviour
 		// This can be done using layers instead but Sample Assets will not overwrite your project settings.
 		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
 		for (int i = 0; i < colliders.Length; i++)
-		{
-            if (colliders[i].gameObject != gameObject && m_Rigidbody2D.velocity.y == 0)
-			{
-				m_Grounded = true;
-				alreadyPerformedDoubleJump = false;
-				if (!wasGrounded)
-					OnLandEvent.Invoke();
-				break;
-			}
-		}
-	}
+        {
+            if (colliders[i].gameObject != gameObject)
+            {
+                m_Grounded = true;
+                alreadyPerformedDoubleJump = false;
+                if (!wasGrounded)
+                {
+                    OnLandEvent.Invoke();
+                }
+            }
+        }
+    }
 	public void Move(float move, bool crouch, bool jump)
 	{
 		// If crouching, check to see if the character can stand up
@@ -139,7 +145,6 @@ public class CharacterController2D : MonoBehaviour
 		if (m_Grounded && jump)
 		{
 			// Add a vertical force to the player.
-			m_Grounded = false;
 			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 			OnJumpEvent?.Invoke();
 		}
@@ -157,7 +162,6 @@ public class CharacterController2D : MonoBehaviour
 	{
 		// Switch the way the player is labelled as facing.
 		m_FacingRight = !m_FacingRight;
-
-		// Multiply the player's x local scale by -1.
+		visuals.flipX = !m_FacingRight;
 	}
 }

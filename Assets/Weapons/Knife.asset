@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a42528dfde0f34a48adea789a1fa9f2e, type: 3}
   m_Name: Knife
   m_EditorClassIdentifier: 
-  cooldown: 0.25
+  cooldown: 0.333
   sprite: {fileID: 0}
   shootSound: {fileID: 8300000, guid: 08cdc99a9eab95a4480f9c1d1ff3d394, type: 3}
   meleeHit: {fileID: 8300000, guid: 08cdc99a9eab95a4480f9c1d1ff3d394, type: 3}

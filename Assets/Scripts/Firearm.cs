@@ -4,7 +4,7 @@
 public class Firearm : WeaponBase
 {
 
-    private static float[] angles = { 285, 270, 210, 180, 135, 90, 30, 0 };
+    private static readonly float[] angles = { 285, 270, 210, 180, 135, 90, 30, 0 };
     [SerializeField] private GameObject projectilePrefab;
     public override void Attack(Entity owner, Vector2 direction)
     {

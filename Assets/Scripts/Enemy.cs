@@ -2,11 +2,12 @@
 
 public class Enemy : Entity
 {
+    private float airTime;
     private int shoots;
     private bool canJump;
     [SerializeField] private float spotDistance;
     private float patrolDirection;
-
+    private bool didShoot = true;
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
@@ -22,6 +23,11 @@ public class Enemy : Entity
     private void Enemy_onEntityLand()
     {
         canJump = true;
+        if (airTime > 2f)
+        {
+            Damage(this, (int)airTime);
+        }
+        airTime = 0;
     }
     private void SetRandomPatrol()
     {
@@ -33,6 +39,7 @@ public class Enemy : Entity
     {
         Player target = Player.Singleton;
         base.Update();
+        airTime += Time.deltaTime;
         if (target == null) return;
         if (canJump && Controller.IsGrounded && !IsMoving && target.transform.position.y > transform.position.y + 5f)
         {
@@ -55,7 +62,8 @@ public class Enemy : Entity
         Aim(-(transform.position - target.transform.position).normalized);
         if (CanAttack())
         {
-            Attack();
+            Attack(didShoot);
+            didShoot = false;
         }
     }
     private bool CanAttack()

@@ -7,6 +7,13 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     [SerializeField] private LayerMask meleeLayerMask;
 
+    public const string IS_MOVING = "isMoving";
+    public const string IS_FALLING = "isFalling";
+    public const string IS_KNOCKED_OUT = "isKnockedOut";
+    public const string JUMP_TRIGGER = "Jump";
+    public const string ATTACK_TRIGGER = "Attack";
+    public const string DAMAGE_TRIGGER = "Damage";
+    public const string LAND_TRIGGER = "Land";
 
     public bool IsVulnerable => isKnockedOut;
 
@@ -27,11 +34,13 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #region Movement
     #region Properties
     protected CharacterController2D Controller => controller;
+    protected Animator EntityAnimator => animator;
     public AudioSource Audio => audioSource;
     [SerializeField] private float speed;
     private bool isJumping;
     #region States
     public bool IsMoving => controller.IsMoving;
+    public bool IsFalling => rb.velocity.y < 0 && !controller.IsGrounded;
     #endregion
     #endregion
     private Vector2 movement;
@@ -40,6 +49,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #region Components
     private CharacterController2D controller;
     private AudioSource audioSource;
+    private Animator animator;
     private Rigidbody2D rb;
     #endregion
     #region Mandatory Methods
@@ -48,6 +58,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         controller = GetComponent<CharacterController2D>();
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         controller.OnLandEvent.AddListener(Entity_onEntityLand);
         controller.OnJumpEvent.AddListener(Entity_onEntityJump);
         onEntityAttack += Entity_onEntityAttack;
@@ -69,6 +80,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     private void Entity_onEntityKnockout()
     {
+
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         sr.color = Color.blue;
         sr.transform.rotation = Quaternion.Euler(0, 0, 90);
@@ -100,7 +112,9 @@ public abstract class Entity : MonoBehaviour, IDamagable
         {
             rb.velocity = new Vector2();
         }
+        Debug.Log("Land");
         audioSource.PlayOneShot(landSound);
+        animator.SetTrigger(LAND_TRIGGER);
         onEntityLand?.Invoke();
     }
 
@@ -108,6 +122,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         audioSource.PlayOneShot(jumpSound);
         onEntityJump?.Invoke();
+        animator.SetTrigger(JUMP_TRIGGER);
     }
 
     #endregion
@@ -120,11 +135,14 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         else
         {
+            controller.Move(0, false, false);
             controller.enabled = false;
         }
     }
     protected virtual void FixedUpdate()
     {
+        // animator.SetBool(IS_MOVING, IsMoving);
+        animator.SetBool(IS_FALLING, IsFalling);
     }
     #endregion
     #region Movement Methods
@@ -148,7 +166,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         isJumping = isTrue;
     }
-    protected void Attack()
+    protected void Attack(bool quickly)
     {
         if (isKnockedOut) return;
         void Punch()
@@ -172,12 +190,26 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         if (currentWeapon != null)
         {
-            TimerUtils.AddTimer(currentWeapon.Cooldown, PerformAttack);
+            if (!quickly)
+            {
+                TimerUtils.AddTimer(currentWeapon.Cooldown, PerformAttack);
+            }
+            else
+            {
+                PerformAttack();
+            }
         }
         else
         {
 
-            TimerUtils.AddTimer(0.5f, Punch);
+            if (!quickly)
+            {
+                TimerUtils.AddTimer(0.5f, Punch);
+            }
+            else
+            {
+                Punch();
+            }
         }
     }
     protected void Aim(Vector2 direction)
@@ -203,11 +235,17 @@ public abstract class Entity : MonoBehaviour, IDamagable
     private int numberOfHits;
     public void Damage(Entity damager, int damage)
     {
-        if (isKnockedOut)
+        void Death ()
+        {
+            Destroy(gameObject,1.75f);
+            KnockOut(damager);
+
+        }
+        if (isKnockedOut && damager != this)
         {
             Push(damager);
+            return;
         }
-        if (IsVulnerable) return;
         numberOfHits += damage;
         health -= damage;
         if (numberOfHits >= 4)
@@ -220,12 +258,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Death();
         }
     }
     private void Stun()
     {
-        numberOfHits = 0;
         isKnockedOut = true;
         onEntityStun?.Invoke();
         TimerUtils.AddTimer(0.33333f, ResetStun);
@@ -237,13 +274,24 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     private void KnockOut(Entity damager)
     {
-        Debug.Log("Knocked out");
-        isKnockedOut = true;
-        Push(damager);
-        onEntityKnockout?.Invoke();
-        TimerUtils.Cancel(ResetStun);
-        TimerUtils.Cancel(NoKnockOut);
-        TimerUtils.AddTimer(2f, NoKnockOut);
+#if UNITY_EDITOR
+        try
+        {
+#endif
+            numberOfHits = 0;
+            isKnockedOut = true;
+            Push(damager);
+            onEntityKnockout?.Invoke();
+            TimerUtils.Cancel(ResetStun);
+            TimerUtils.Cancel(NoKnockOut);
+            TimerUtils.AddTimer(2f, NoKnockOut);
+        }
+#if UNITY_EDITOR
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Oops! " + ex.Message + " " + ex.StackTrace);
+        }
+#endif
     }
 
     private void Push(Entity damager)

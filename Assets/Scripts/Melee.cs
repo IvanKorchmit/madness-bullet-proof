@@ -8,8 +8,7 @@ public class Melee : WeaponBase
     [SerializeField] private int damage;
     public override void Attack(Entity owner, Vector2 direction)
     {
-        RaycastHit2D hit = Physics2D.CircleCast((Vector2)owner.transform.position, 3, direction, 1.5f, owner.MeleeMask);
-        Debug.Log(hit.collider);
+        RaycastHit2D hit = Physics2D.CircleCast(owner.transform.position, 3, direction, 1.5f, owner.MeleeMask);
         if (hit.collider != null)
         {
             if (hit.collider.TryGetComponent(out IDamagable damage))
