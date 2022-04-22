@@ -2,7 +2,7 @@
 
 public class Player : Entity
 {
-    [SerializeField] private AudioClip doublJumpSound;
+    [SerializeField] private AudioClip doubleJumpSound;
     private static Player _instance;
     public static Player Singleton => _instance;
     protected override void Start()
@@ -16,7 +16,7 @@ public class Player : Entity
     }
     private void OnPlayerDoubleJump()
     {
-        Audio.PlayOneShot(doublJumpSound);
+        Audio.PlayOneShot(doubleJumpSound);
         EntityAnimator.SetTrigger(JUMP_TRIGGER);
     }
 

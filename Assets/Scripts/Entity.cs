@@ -1,26 +1,40 @@
 using UnityEngine;
 public abstract class Entity : MonoBehaviour, IDamagable
 {
+    #region SFX
     [SerializeField] private AudioClip landSound;
     [SerializeField] private AudioClip jumpSound;
     [SerializeField] private AudioClip defaultPunchSound;
+    #endregion
 
-    [SerializeField] private LayerMask meleeLayerMask;
+    [SerializeField] private GameObject bloodParticle;
 
+    #region Animation const
     public const string IS_MOVING = "isMoving";
     public const string IS_FALLING = "isFalling";
     public const string IS_KNOCKED_OUT = "isKnockedOut";
     public const string JUMP_TRIGGER = "Jump";
     public const string ATTACK_TRIGGER = "Attack";
+    public const string STUN_TRIGGER = "Stun";
     public const string DAMAGE_TRIGGER = "Damage";
     public const string LAND_TRIGGER = "Land";
+    public const string KNOCKOUT_TRIGGER = "Knockout";
+    public const string WAKEUP_TRIGGER = "WakeUp";
+    public const string RECOVER_TRIGGER = "Recover";
+    #endregion
 
     public bool IsVulnerable => isKnockedOut;
-
+    private bool isStunned;
+    public bool IsStunned => isKnockedOut || isStunned;
+    #region Combat
     [SerializeField] private WeaponBase currentWeapon;
-    private int ammo;
+    [SerializeField] private LayerMask meleeLayerMask;
     private Vector2 aimDirection;
+    private int ammo;
     public int MeleeMask => meleeLayerMask;
+
+    #endregion
+    [SerializeField] private int stamina;
     #region Action Events
     public event System.Action onEntityLand;
     public event System.Action onEntityJump;
@@ -73,27 +87,23 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     private void Entity_onEntityWakeUp()
     {
-        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
-        sr.color = Color.white;
-        sr.transform.rotation = Quaternion.identity;
+        animator.SetTrigger(WAKEUP_TRIGGER);
+        isKnockedOut = false;
     }
 
     private void Entity_onEntityKnockout()
     {
-
-        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
-        sr.color = Color.blue;
-        sr.transform.rotation = Quaternion.Euler(0, 0, 90);
+        animator.SetTrigger(KNOCKOUT_TRIGGER);
 
     }
     private void Entity_onEntityRecover()
     {
-        GetComponentInChildren<SpriteRenderer>().color = Color.white;
+        animator.SetTrigger(RECOVER_TRIGGER);
     }
 
     private void Entity_onEntityStun()
     {
-        GetComponentInChildren<SpriteRenderer>().color = Color.red;
+        animator.SetTrigger(STUN_TRIGGER);
     }
 
     protected virtual void Entity_onEntityAttack()
@@ -108,11 +118,10 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     protected virtual void Entity_onEntityLand()
     {
-        if (isKnockedOut)
+        if (IsStunned)
         {
             rb.velocity = new Vector2();
         }
-        Debug.Log("Land");
         audioSource.PlayOneShot(landSound);
         animator.SetTrigger(LAND_TRIGGER);
         onEntityLand?.Invoke();
@@ -128,21 +137,34 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #endregion
     protected virtual void Update()
     {
-        if (!isKnockedOut)
+        if (!IsStunned && !isWakingUp)
         {
             controller.enabled = true;
             controller.Move(movement.x * speed, crounch, isJumping);
         }
-        else
+        else if (!isWakingUp)
         {
             controller.Move(0, false, false);
             controller.enabled = false;
+            if (!IsFalling)
+            {
+                knockedOutTime -= Time.deltaTime;
+                if (isKnockedOut && knockedOutTime <= 0)
+                {
+                    NoKnockOut();
+                }
+            }
         }
+    }
+    public void UnlockMovement()
+    {
+        isWakingUp = false;
     }
     protected virtual void FixedUpdate()
     {
         // animator.SetBool(IS_MOVING, IsMoving);
         animator.SetBool(IS_FALLING, IsFalling);
+        animator.SetBool(IS_KNOCKED_OUT, isKnockedOut);
     }
     #endregion
     #region Movement Methods
@@ -152,6 +174,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
     /// <param name="direction"></param>
     protected void Move(float direction)
     {
+        if (IsStunned)
+        {
+            movement.x = 0;
+            return;
+        }
         movement.x = direction;
     }
     /// <summary>
@@ -168,7 +195,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     protected void Attack(bool quickly)
     {
-        if (isKnockedOut) return;
+        if (IsStunned) return;
         void Punch()
         {
             if (isKnockedOut) return;
@@ -177,14 +204,16 @@ public abstract class Entity : MonoBehaviour, IDamagable
             {
                 if (hit.collider.TryGetComponent(out IDamagable damage))
                 {
-                    damage.Damage(this, 2);
-                    onEntityPunch?.Invoke();
+                    if (damage.Damage(this, 1))
+                    {
+                        onEntityPunch?.Invoke();
+                    }
                 }
             }
         }
         void PerformAttack()
         {
-            if (isKnockedOut) return;
+            if (IsStunned) return;
             currentWeapon?.Attack(this, aimDirection);
             onEntityAttack?.Invoke();
         }
@@ -214,7 +243,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     protected void Aim(Vector2 direction)
     {
-        if (isKnockedOut) return;
+        if (IsStunned) return;
 
         if (direction == Vector2.zero)
         {
@@ -225,15 +254,18 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     public void Crounch(bool isTrue)
     {
-        if (isKnockedOut) return;
+        if (IsStunned) return;
 
         crounch = isTrue;
     }
     #endregion
     [SerializeField] private int health = 10;
     private bool isKnockedOut;
+    private bool isWakingUp;
+    private float knockedOutTime;
     private int numberOfHits;
-    public void Damage(Entity damager, int damage)
+    private int numberOfHitsStunned;
+    public bool Damage(Entity damager, int damage)
     {
         void Death ()
         {
@@ -241,14 +273,21 @@ public abstract class Entity : MonoBehaviour, IDamagable
             KnockOut(damager);
 
         }
-        if (isKnockedOut && damager != this)
+        if (IsStunned && damager != this)
         {
-            Push(damager);
-            return;
+            if (numberOfHitsStunned < 4)
+            {
+                Push(damager);
+                numberOfHitsStunned++;
+                Instantiate(bloodParticle, transform.position, Quaternion.identity);
+
+                return true;
+            }
+            return false;
         }
         numberOfHits += damage;
         health -= damage;
-        if (numberOfHits >= 4)
+        if (numberOfHits >= stamina)
         {
             KnockOut(damager);
         }
@@ -260,16 +299,17 @@ public abstract class Entity : MonoBehaviour, IDamagable
         {
             Death();
         }
+        Instantiate(bloodParticle, transform.position, Quaternion.identity);
+        return true;
     }
     private void Stun()
     {
-        isKnockedOut = true;
+        isStunned = true;
         onEntityStun?.Invoke();
-        TimerUtils.AddTimer(0.33333f, ResetStun);
     }
-    private void ResetStun()
+    public void ResetStun()
     {
-        isKnockedOut = false;
+        isStunned = false;
         onEntityRecover?.Invoke();
     }
     private void KnockOut(Entity damager)
@@ -278,13 +318,13 @@ public abstract class Entity : MonoBehaviour, IDamagable
         try
         {
 #endif
+            isWakingUp = false;
+
+            knockedOutTime =  !isKnockedOut ? 3f : knockedOutTime;
             numberOfHits = 0;
             isKnockedOut = true;
             Push(damager);
             onEntityKnockout?.Invoke();
-            TimerUtils.Cancel(ResetStun);
-            TimerUtils.Cancel(NoKnockOut);
-            TimerUtils.AddTimer(2f, NoKnockOut);
         }
 #if UNITY_EDITOR
         catch (System.Exception ex)
@@ -304,6 +344,8 @@ public abstract class Entity : MonoBehaviour, IDamagable
     public void NoKnockOut()
     {
         isKnockedOut = false;
+        isWakingUp = true;
+        numberOfHitsStunned = 0;
         onEntityWakeUp?.Invoke();
     }
 }
@@ -316,6 +358,6 @@ interface IDamagable
     /// </summary>
     /// <param name="damager">Who did the damage?</param>
     /// <param name="damage">The amount of damage</param>
-    void Damage(Entity damager, int damage);
+    bool Damage(Entity damager, int damage);
     bool IsVulnerable { get; }
 }

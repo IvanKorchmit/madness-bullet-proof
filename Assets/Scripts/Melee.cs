@@ -13,8 +13,14 @@ public class Melee : WeaponBase
         {
             if (hit.collider.TryGetComponent(out IDamagable damage))
             {
-                damage.Damage(owner, this.damage);
-                owner.Audio.PlayOneShot(meleeHit);
+                if (damage.Damage(owner, this.damage))
+                {
+                    owner.Audio.PlayOneShot(meleeHit);
+                }
+                else
+                {
+                    owner.Audio.PlayOneShot(meleeSwing);
+                }
             }
             else
             {
