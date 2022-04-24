@@ -40,6 +40,10 @@ public class Projectile : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.CompareTag("Obstacle"))
+        {
+            Destroy(gameObject);
+        }
 
         bool ignore = (owner as Enemy) != null && collision.GetComponent<Entity>() is Enemy;
 

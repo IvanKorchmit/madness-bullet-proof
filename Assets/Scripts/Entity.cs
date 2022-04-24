@@ -5,6 +5,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     [SerializeField] private AudioClip landSound;
     [SerializeField] private AudioClip jumpSound;
     [SerializeField] private AudioClip defaultPunchSound;
+    [SerializeField] private AudioClip[] stepSounds;
     #endregion
 
     [SerializeField] private GameObject bloodParticle;
@@ -13,6 +14,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     public const string IS_MOVING = "isMoving";
     public const string IS_FALLING = "isFalling";
     public const string IS_KNOCKED_OUT = "isKnockedOut";
+    public const string HAS_FIREARM = "hasFirearm";
     public const string JUMP_TRIGGER = "Jump";
     public const string ATTACK_TRIGGER = "Attack";
     public const string STUN_TRIGGER = "Stun";
@@ -25,9 +27,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     public bool IsVulnerable => isKnockedOut;
     private bool isStunned;
+    private bool hasAttacked;
     public bool IsStunned => isKnockedOut || isStunned;
     #region Combat
     [SerializeField] private WeaponBase currentWeapon;
+    public WeaponBase CurrentWeapon => currentWeapon;
     [SerializeField] private LayerMask meleeLayerMask;
     private Vector2 aimDirection;
     private int ammo;
@@ -53,8 +57,8 @@ public abstract class Entity : MonoBehaviour, IDamagable
     [SerializeField] private float speed;
     private bool isJumping;
     #region States
-    public bool IsMoving => controller.IsMoving;
-    public bool IsFalling => rb.velocity.y < 0 && !controller.IsGrounded;
+    public bool IsMoving => movement.x != 0 && controller.IsGrounded && !(isStunned || isWakingUp || isKnockedOut || IsFalling);
+    public bool IsFalling => rb.velocity.y < 0 && !Controller.IsGrounded;
     #endregion
     #endregion
     private Vector2 movement;
@@ -65,6 +69,8 @@ public abstract class Entity : MonoBehaviour, IDamagable
     private AudioSource audioSource;
     private Animator animator;
     private Rigidbody2D rb;
+    private SpriteRenderer weaponVisuals;
+    [SerializeField] private Collider2D mainCollider;
     #endregion
     #region Mandatory Methods
     protected virtual void Start()
@@ -81,42 +87,89 @@ public abstract class Entity : MonoBehaviour, IDamagable
         onEntityRecover += Entity_onEntityRecover;
         onEntityKnockout += Entity_onEntityKnockout;
         onEntityWakeUp += Entity_onEntityWakeUp;
+        weaponVisuals = transform.Find("Weapon").GetComponentInChildren<SpriteRenderer>();
     }
 
     #region Event Subscriptions
-
+    public void StepSound()
+    {
+        Audio.PlayOneShot(stepSounds[Random.Range(0, stepSounds.Length)]);
+    }
     private void Entity_onEntityWakeUp()
     {
         animator.SetTrigger(WAKEUP_TRIGGER);
         isKnockedOut = false;
+        isStunned = false;
+        isWakingUp = false;
+        hasAttacked = false;
     }
 
     private void Entity_onEntityKnockout()
     {
+        isWakingUp = false;
+        hasAttacked = false;
+        isStunned = false;
         animator.SetTrigger(KNOCKOUT_TRIGGER);
 
     }
+
+    protected void JumpOff()
+    {
+
+
+        var hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(1, 2), 0);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].CompareTag("Platform"))
+            {
+                var colliders = GetComponents<Collider2D>();
+                void Back()
+                {
+                    foreach (var currentCollider in GetComponents<Collider2D>())
+                    {
+                        Physics2D.IgnoreCollision(currentCollider, hits[i], false);
+                    }
+                }
+                foreach (var currentCollider in GetComponents<Collider2D>())
+                {
+                    Physics2D.IgnoreCollision(currentCollider, hits[i], true);
+                }
+                TimerUtils.AddTimer(1f, Back);
+                break;
+            }
+        }
+    }
+
     private void Entity_onEntityRecover()
     {
+        hasAttacked = false;
+        isStunned = false;
+        isWakingUp = false;
         animator.SetTrigger(RECOVER_TRIGGER);
     }
 
     private void Entity_onEntityStun()
     {
         animator.SetTrigger(STUN_TRIGGER);
+        isWakingUp = false;
+        hasAttacked = false;
     }
 
     protected virtual void Entity_onEntityAttack()
     {
         audioSource.PlayOneShot(currentWeapon.ShootSound);
+        isStunned = false;
     }
 
     private void Entity_onEntityPunch()
     {
+        isStunned = false;
+        isWakingUp = false;
+        hasAttacked = false;    
         audioSource.PlayOneShot(defaultPunchSound);
     }
 
-    protected virtual void Entity_onEntityLand()
+    private void Entity_onEntityLand()
     {
         if (IsStunned)
         {
@@ -131,6 +184,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         audioSource.PlayOneShot(jumpSound);
         onEntityJump?.Invoke();
+        hasAttacked = false;
         animator.SetTrigger(JUMP_TRIGGER);
     }
 
@@ -139,13 +193,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         if (!IsStunned && !isWakingUp)
         {
-            controller.enabled = true;
             controller.Move(movement.x * speed, crounch, isJumping);
         }
         else if (!isWakingUp)
         {
             controller.Move(0, false, false);
-            controller.enabled = false;
             if (!IsFalling)
             {
                 knockedOutTime -= Time.deltaTime;
@@ -162,9 +214,18 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     protected virtual void FixedUpdate()
     {
-        // animator.SetBool(IS_MOVING, IsMoving);
+        animator.SetBool(IS_MOVING, IsMoving);
         animator.SetBool(IS_FALLING, IsFalling);
+        if (IsFalling && !animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
+        {
+            hasAttacked = false;
+        }
         animator.SetBool(IS_KNOCKED_OUT, isKnockedOut);
+        animator.SetBool(HAS_FIREARM, currentWeapon != null && currentWeapon is Firearm);
+        if (currentWeapon == null)
+        {
+            weaponVisuals.sprite = null;
+        }
     }
     #endregion
     #region Movement Methods
@@ -174,7 +235,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     /// <param name="direction"></param>
     protected void Move(float direction)
     {
-        if (IsStunned)
+        if (IsStunned || isWakingUp || animator.GetCurrentAnimatorStateInfo(0).IsTag("NoMove"))
         {
             movement.x = 0;
             return;
@@ -193,24 +254,25 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         isJumping = isTrue;
     }
-    protected void Attack(bool quickly)
+    public void Punch()
     {
-        if (IsStunned) return;
-        void Punch()
+        if (isKnockedOut) return;
+        hasAttacked = false;
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 2f, movement, 1f, meleeLayerMask);
+        if (hit.collider != null)
         {
-            if (isKnockedOut) return;
-            RaycastHit2D hit = Physics2D.CircleCast(transform.position, 2f, movement, 1f, meleeLayerMask);
-            if (hit.collider != null)
+            if (hit.collider.TryGetComponent(out IDamagable damage))
             {
-                if (hit.collider.TryGetComponent(out IDamagable damage))
+                if (damage.Damage(this, 1))
                 {
-                    if (damage.Damage(this, 1))
-                    {
-                        onEntityPunch?.Invoke();
-                    }
+                    onEntityPunch?.Invoke();
                 }
             }
         }
+    }
+    protected void Attack()
+    {
+        if (IsStunned) return;
         void PerformAttack()
         {
             if (IsStunned) return;
@@ -219,38 +281,36 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         if (currentWeapon != null)
         {
-            if (!quickly)
-            {
+
                 TimerUtils.AddTimer(currentWeapon.Cooldown, PerformAttack);
-            }
-            else
-            {
-                PerformAttack();
-            }
         }
         else
         {
-
-            if (!quickly)
+            if (!hasAttacked && !IsFalling && !IsStunned && !isWakingUp)
             {
-                TimerUtils.AddTimer(0.5f, Punch);
-            }
-            else
-            {
-                Punch();
+                animator.SetTrigger(ATTACK_TRIGGER);
+                hasAttacked = true;
             }
         }
     }
     protected void Aim(Vector2 direction)
     {
+        void WeaponAim()
+        {
+            weaponVisuals.flipY = aimDirection.x < 0;
+            float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+            weaponVisuals.transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
         if (IsStunned) return;
 
         if (direction == Vector2.zero)
         {
             aimDirection.y = 0;
+            WeaponAim();
             return;
         }
         aimDirection = direction;
+        WeaponAim();
     }
     public void Crounch(bool isTrue)
     {
@@ -319,14 +379,13 @@ public abstract class Entity : MonoBehaviour, IDamagable
         {
 #endif
             isWakingUp = false;
-
             knockedOutTime =  !isKnockedOut ? 3f : knockedOutTime;
             numberOfHits = 0;
             isKnockedOut = true;
             Push(damager);
             onEntityKnockout?.Invoke();
-        }
 #if UNITY_EDITOR
+        }
         catch (System.Exception ex)
         {
             Debug.LogError("Oops! " + ex.Message + " " + ex.StackTrace);
@@ -338,6 +397,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         Vector2 direction = transform.position - damager.transform.position;
         rb.velocity = new Vector2();
+        rb.position += Vector2.up * 1.5f;
         rb.AddForce(new Vector2((direction.x >= 0f ? 1f : -1f) * 5f, 10f), ForceMode2D.Impulse);
     }
 

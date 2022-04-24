@@ -41,11 +41,11 @@ public class CharacterController2D : MonoBehaviour
 	private bool m_wasCrouching = false;
     private void Start()
     {
-		visuals = GetComponentInChildren<SpriteRenderer>();
-    }
+		m_Rigidbody2D = GetComponent<Rigidbody2D>();
+		visuals = transform.Find("Visual").GetComponent<SpriteRenderer>();
+	}
     private void Awake()
 	{
-		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
 		if (OnLandEvent == null)
 			OnLandEvent = new UnityEvent();

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad7e38177d11244fb4dd343f53ed44c, type: 3}
+  m_Name: Shotgun
+  m_EditorClassIdentifier: 
+  cooldown: 0.37
+  sprite: {fileID: 0}
+  shootSound: {fileID: 8300000, guid: 1f1ae1f57e9e28c41a31cfc0c355c445, type: 3}
+  projectilePrefab: {fileID: 6081967461690896097, guid: 3a90c5e9cd48a2e449a1235b613db757, type: 3}
+  cone: 0

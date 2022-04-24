@@ -24,10 +24,11 @@ public class Player : Entity
     {
         base.Update();
         Move(Input.GetAxisRaw("Horizontal"));
-        Jump(Input.GetKeyDown(KeyCode.Space));
+        Jump(Input.GetKeyDown(KeyCode.Space) && !Input.GetKey(KeyCode.LeftShift));
         Crounch(Input.GetKey(KeyCode.LeftShift));
         Aim(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
-        if (Input.GetKey(KeyCode.Return)) Attack(Input.GetKeyDown(KeyCode.Return));
+        if (Input.GetKey(KeyCode.Return)) Attack();
+        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift)) JumpOff();
     }
     protected override void FixedUpdate()
     {

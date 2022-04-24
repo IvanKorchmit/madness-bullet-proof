@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName ="New Gun")]
+[CreateAssetMenu(fileName = "New Gun")]
 public class Firearm : WeaponBase
 {
 
     private static readonly float[] angles = { 285, 270, 210, 180, 135, 90, 30, 0 };
-    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] protected GameObject projectilePrefab;
     public override void Attack(Entity owner, Vector2 direction)
     {
-        Quaternion rotation = Quaternion.Euler(0, 0, Angle(direction,owner));
+        Quaternion rotation = Quaternion.Euler(0, 0, Angle(direction, owner));
         Instantiate(projectilePrefab, owner.transform.position, rotation).GetComponent<Projectile>().Init(owner);
     }
+
     private static float Angle(Vector3 v, Entity owner)
     {
         // normalize the vector: this makes the x and y components numerically

@@ -7,7 +7,6 @@ public class Enemy : Entity
     private bool canJump;
     [SerializeField] private float spotDistance;
     private float patrolDirection;
-    private bool didShoot = true;
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
@@ -16,16 +15,22 @@ public class Enemy : Entity
     {
         base.Start();
         onEntityLand += Enemy_onEntityLand;
+        onEntityPunch += Enemy_onEntityPunch;
         canJump = true;
         SetRandomPatrol();
+    }
+
+    private void Enemy_onEntityPunch()
+    {
+        shoots++;
     }
 
     private void Enemy_onEntityLand()
     {
         canJump = true;
-        if (airTime > 2f)
+        if (airTime > 4f)
         {
-            Damage(this, (int)airTime);
+            Damage(this, (int)airTime / 4);
         }
         airTime = 0;
     }
@@ -41,7 +46,7 @@ public class Enemy : Entity
         base.Update();
         airTime += Time.deltaTime;
         if (target == null) return;
-        if (canJump && Controller.IsGrounded && !IsMoving && target.transform.position.y > transform.position.y + 5f)
+        if (canJump && Vector2.Distance(transform.position, target.transform.position) <= spotDistance && Controller.IsGrounded && !IsMoving && target.transform.position.y > transform.position.y + 5f)
         {
             Jump(true);
             canJump = false;
@@ -62,8 +67,14 @@ public class Enemy : Entity
         Aim(-(transform.position - target.transform.position).normalized);
         if (CanAttack())
         {
-            Attack(didShoot);
-            didShoot = false;
+            if (CurrentWeapon is Firearm)
+            {
+                Attack();
+            }
+            else if ((CurrentWeapon == null || CurrentWeapon is Melee) && Vector2.Distance(Player.Singleton.transform.position, transform.position) <= spotDistance / 10)
+            {
+                Attack();
+            }
         }
     }
     private bool CanAttack()
