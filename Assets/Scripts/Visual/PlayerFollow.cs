@@ -18,7 +18,7 @@ public class PlayerFollow : MonoBehaviour
 
     private void Player_onPlayerAttack()
     {
-        StartCoroutine(Shake(0.009f, 0.25f, 0.5f));
+        StartCoroutine(Shake(0.009f, 0.1f, 0.5f));
     }
 
     private void Player_onPlayerJumpOrLand()

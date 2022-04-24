@@ -5,8 +5,12 @@ public class Enemy : Entity
     private float airTime;
     private int shoots;
     private bool canJump;
+    private bool hasSpotted;
     [SerializeField] private float spotDistance;
     private float patrolDirection;
+
+    private LineOfSight los;
+
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
@@ -18,6 +22,17 @@ public class Enemy : Entity
         onEntityPunch += Enemy_onEntityPunch;
         canJump = true;
         SetRandomPatrol();
+        los = GetComponent<LineOfSight>();
+        los.onPlayerSpot += Los_onPlayerSpot;
+        speed *= Random.Range(0.8f, 1.2f);
+    }
+
+    private void Los_onPlayerSpot()
+    {
+        if (!hasSpotted)
+        {
+            hasSpotted = true;
+        }
     }
 
     private void Enemy_onEntityPunch()
@@ -44,28 +59,18 @@ public class Enemy : Entity
     {
         Player target = Player.Singleton;
         base.Update();
-        airTime += Time.deltaTime;
-        if (target == null) return;
-        if (canJump && Vector2.Distance(transform.position, target.transform.position) <= spotDistance && Controller.IsGrounded && !IsMoving && target.transform.position.y > transform.position.y + 5f)
+        if (!Controller.IsGrounded)
         {
-            Jump(true);
-            canJump = false;
+            airTime += Time.deltaTime;
         }
-        else
-        {
-            Jump(false);
-        }
-        if (Vector2.Distance(target.transform.position, transform.position) <= spotDistance)
-        {
-            Move(transform.position.x >= target.transform.position.x ? -1f : 1f);
-        }
-        else
+        if (target == null)
         {
             Move(patrolDirection);
-            
+            return;
         }
-        Aim(-(transform.position - target.transform.position).normalized);
-        if (CanAttack())
+        TryJump(target);
+        TryMove(target);
+        if (CanAttack() && hasSpotted)
         {
             if (CurrentWeapon is Firearm)
             {
@@ -74,6 +79,33 @@ public class Enemy : Entity
             else if ((CurrentWeapon == null || CurrentWeapon is Melee) && Vector2.Distance(Player.Singleton.transform.position, transform.position) <= spotDistance / 10)
             {
                 Attack();
+            }
+        }
+
+        void TryJump(Player target)
+        {
+            if (hasSpotted && canJump && !IsMoving && target.transform.position.y > transform.position.y + 5f)
+            {
+                Jump(true);
+                canJump = false;
+            }
+            else
+            {
+                Jump(false);
+            }
+        }
+
+        void TryMove(Player target)
+        {
+            if (hasSpotted)
+            {
+                Move(transform.position.x >= target.transform.position.x ? -1f : 1f);
+                Aim(-(transform.position - target.transform.position).normalized);
+            }
+            else
+            {
+                Move(patrolDirection);
+                Aim(new Vector2(patrolDirection, 0));
             }
         }
     }

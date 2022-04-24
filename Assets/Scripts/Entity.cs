@@ -9,7 +9,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #endregion
 
     [SerializeField] private GameObject bloodParticle;
-
+    public int Health => health;
     #region Animation const
     public const string IS_MOVING = "isMoving";
     public const string IS_FALLING = "isFalling";
@@ -54,7 +54,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     protected CharacterController2D Controller => controller;
     protected Animator EntityAnimator => animator;
     public AudioSource Audio => audioSource;
-    [SerializeField] private float speed;
+    [SerializeField] protected float speed;
     private bool isJumping;
     #region States
     public bool IsMoving => movement.x != 0 && controller.IsGrounded && !(isStunned || isWakingUp || isKnockedOut || IsFalling);
@@ -362,6 +362,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
         Instantiate(bloodParticle, transform.position, Quaternion.identity);
         return true;
     }
+    
+    public void InstantKill()
+    {
+        Damage(this, 9999);
+    }
     private void Stun()
     {
         isStunned = true;
@@ -419,5 +424,6 @@ interface IDamagable
     /// <param name="damager">Who did the damage?</param>
     /// <param name="damage">The amount of damage</param>
     bool Damage(Entity damager, int damage);
+    void InstantKill();
     bool IsVulnerable { get; }
 }

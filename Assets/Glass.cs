@@ -7,7 +7,10 @@ public class Glass : MonoBehaviour, IDamagable
     [SerializeField] private GameObject glassShards;
     private bool isBroken;
     public bool IsVulnerable => throw new System.NotImplementedException();
-
+    public void InstantKill()
+    {
+        Break();
+    }
     // Start is called before the first frame update
     void Start()
     {
