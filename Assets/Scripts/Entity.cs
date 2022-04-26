@@ -24,17 +24,37 @@ public abstract class Entity : MonoBehaviour, IDamagable
     public const string WAKEUP_TRIGGER = "WakeUp";
     public const string RECOVER_TRIGGER = "Recover";
     #endregion
-
-    public bool IsVulnerable => isKnockedOut;
+    private bool immune;
+    public bool IsVulnerable => isKnockedOut || isWakingUp;
     private bool isStunned;
     private bool hasAttacked;
-    public bool IsStunned => isKnockedOut || isStunned;
     #region Combat
     [SerializeField] private WeaponBase currentWeapon;
-    public WeaponBase CurrentWeapon => currentWeapon;
+    protected WeaponBase CurrentWeapon
+    {
+        get
+        {
+            return currentWeapon;
+        }
+        set
+        {
+            currentWeapon = value;
+        }
+    }
     [SerializeField] private LayerMask meleeLayerMask;
     private Vector2 aimDirection;
     private int ammo;
+    public int Ammo
+    {
+        get
+        {
+            return ammo;
+        }
+        protected set
+        {
+            ammo = value;
+        }
+    }
     public int MeleeMask => meleeLayerMask;
 
     #endregion
@@ -70,6 +90,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     private Animator animator;
     private Rigidbody2D rb;
     private SpriteRenderer weaponVisuals;
+    private SpriteRenderer visuals;
     [SerializeField] private Collider2D mainCollider;
     #endregion
     #region Mandatory Methods
@@ -88,6 +109,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         onEntityKnockout += Entity_onEntityKnockout;
         onEntityWakeUp += Entity_onEntityWakeUp;
         weaponVisuals = transform.Find("Weapon").GetComponentInChildren<SpriteRenderer>();
+        visuals = transform.Find("Visual").GetComponent<SpriteRenderer>();
     }
 
     #region Event Subscriptions
@@ -97,11 +119,16 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     private void Entity_onEntityWakeUp()
     {
+        void ResetImmune()
+        {
+            immune = false;
+        }
         animator.SetTrigger(WAKEUP_TRIGGER);
         isKnockedOut = false;
         isStunned = false;
         isWakingUp = false;
         hasAttacked = false;
+        TimerUtils.AddTimer(1.5f, ResetImmune);
     }
 
     private void Entity_onEntityKnockout()
@@ -115,8 +142,6 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     protected void JumpOff()
     {
-
-
         var hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(1, 2), 0);
         for (int i = 0; i < hits.Length; i++)
         {
@@ -171,7 +196,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
 
     private void Entity_onEntityLand()
     {
-        if (IsStunned)
+        if (isKnockedOut)
         {
             rb.velocity = new Vector2();
         }
@@ -191,7 +216,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #endregion
     protected virtual void Update()
     {
-        if (!IsStunned && !isWakingUp)
+        if (!isStunned && !isKnockedOut && !isWakingUp)
         {
             controller.Move(movement.x * speed, crounch, isJumping);
         }
@@ -224,7 +249,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
         animator.SetBool(HAS_FIREARM, currentWeapon != null && currentWeapon is Firearm);
         if (currentWeapon == null)
         {
-            weaponVisuals.sprite = null;
+            weaponVisuals.enabled = false;
+        }
+        else
+        {
+            weaponVisuals.enabled = true;
         }
     }
     #endregion
@@ -235,7 +264,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     /// <param name="direction"></param>
     protected void Move(float direction)
     {
-        if (IsStunned || isWakingUp || animator.GetCurrentAnimatorStateInfo(0).IsTag("NoMove"))
+        if (isKnockedOut || isStunned || isWakingUp || animator.GetCurrentAnimatorStateInfo(0).IsTag("NoMove"))
         {
             movement.x = 0;
             return;
@@ -272,12 +301,18 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     protected void Attack()
     {
-        if (IsStunned) return;
+        if (isStunned || isKnockedOut) return;
         void PerformAttack()
         {
-            if (IsStunned) return;
+            if (isStunned || isKnockedOut) return;
+            if (currentWeapon != null && currentWeapon is Firearm && ammo <= 0)
+            {
+                currentWeapon = null;
+                return;
+            }
             currentWeapon?.Attack(this, aimDirection);
             onEntityAttack?.Invoke();
+            if (currentWeapon is Firearm) ammo--;
         }
         if (currentWeapon != null)
         {
@@ -286,7 +321,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         else
         {
-            if (!hasAttacked && !IsFalling && !IsStunned && !isWakingUp)
+            if (!hasAttacked && !IsFalling && !(isStunned || isKnockedOut) && !isWakingUp)
             {
                 animator.SetTrigger(ATTACK_TRIGGER);
                 hasAttacked = true;
@@ -297,15 +332,14 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         void WeaponAim()
         {
-            weaponVisuals.flipY = aimDirection.x < 0;
+            weaponVisuals.flipY = aimDirection.x < 0 || visuals.flipX;
             float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
             weaponVisuals.transform.rotation = Quaternion.Euler(0, 0, angle);
         }
-        if (IsStunned) return;
-
+        if (isKnockedOut || isStunned) return;
         if (direction == Vector2.zero)
         {
-            aimDirection.y = 0;
+            direction.y = 0;
             WeaponAim();
             return;
         }
@@ -314,7 +348,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     public void Crounch(bool isTrue)
     {
-        if (IsStunned) return;
+        if (isKnockedOut || isStunned) return;
 
         crounch = isTrue;
     }
@@ -327,13 +361,18 @@ public abstract class Entity : MonoBehaviour, IDamagable
     private int numberOfHitsStunned;
     public bool Damage(Entity damager, int damage)
     {
+        void Stun()
+        {
+            isStunned = true;
+            onEntityStun?.Invoke();
+        }
         void Death ()
         {
             Destroy(gameObject,1.75f);
             KnockOut(damager);
 
         }
-        if (IsStunned && damager != this)
+        if (isKnockedOut && damager != this)
         {
             if (numberOfHitsStunned < 4)
             {
@@ -345,6 +384,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
             }
             return false;
         }
+        if (IsVulnerable || immune) return false;
         numberOfHits += damage;
         health -= damage;
         if (numberOfHits >= stamina)
@@ -366,11 +406,6 @@ public abstract class Entity : MonoBehaviour, IDamagable
     public void InstantKill()
     {
         Damage(this, 9999);
-    }
-    private void Stun()
-    {
-        isStunned = true;
-        onEntityStun?.Invoke();
     }
     public void ResetStun()
     {
@@ -411,6 +446,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         isKnockedOut = false;
         isWakingUp = true;
         numberOfHitsStunned = 0;
+        immune = true;
         onEntityWakeUp?.Invoke();
     }
 }

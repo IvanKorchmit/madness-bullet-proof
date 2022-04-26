@@ -10,6 +10,18 @@ public class Player : Entity
         base.Start();
         Controller.OnDoubleJumpEvent.AddListener(OnPlayerDoubleJump);
     }
+    public void SetWeapon(WeaponBase w, int ammo)
+    {
+        if (w == CurrentWeapon)
+        {
+            Ammo += ammo;
+        }
+        else
+        {
+            CurrentWeapon = w;
+            Ammo = ammo;
+        }
+    }
     private void Awake()
     {
         _instance = this;

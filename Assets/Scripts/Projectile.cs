@@ -5,6 +5,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     private Entity owner;
+    private Vector2 startPosition;
     private enum TrajectoryType
     {
         Straight, Sine
@@ -24,6 +25,7 @@ public class Projectile : MonoBehaviour
         rb.velocity = transform.right * speed;
         axis = transform.up;
         pos = rb.position;
+        startPosition = transform.position;
     }
     public Projectile Init(Entity owner)
     {
@@ -36,6 +38,10 @@ public class Projectile : MonoBehaviour
         {
             pos += transform.right * Time.deltaTime * speed;
             rb.MovePosition(pos + axis * Mathf.Sin(time * frequency) * amplitude);
+        }
+        if (Vector2.Distance(startPosition, transform.position) >= 15)
+        {
+            Destroy(gameObject);
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

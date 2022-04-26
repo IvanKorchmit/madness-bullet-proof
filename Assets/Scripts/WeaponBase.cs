@@ -8,4 +8,5 @@ public abstract class WeaponBase : ScriptableObject
     public abstract void Attack(Entity owner, Vector2 direction);
     public AudioClip ShootSound => shootSound;
     public float Cooldown => cooldown;
+    public Sprite WeaponSprite => sprite;
 }

@@ -152,7 +152,7 @@ MonoBehaviour:
   stamina: 3
   speed: 0.75
   mainCollider: {fileID: 5428329920567092903}
-  health: 5
+  health: 3
   spotDistance: 10
 --- !u!114 &5428329920567092897
 MonoBehaviour:

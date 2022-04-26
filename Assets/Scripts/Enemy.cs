@@ -24,7 +24,8 @@ public class Enemy : Entity
         SetRandomPatrol();
         los = GetComponent<LineOfSight>();
         los.onPlayerSpot += Los_onPlayerSpot;
-        speed *= Random.Range(0.8f, 1.2f);
+        speed *= Random.Range(0.8f, 1.8f);
+        Ammo = 25;
     }
 
     private void Los_onPlayerSpot()

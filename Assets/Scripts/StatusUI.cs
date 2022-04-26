@@ -11,6 +11,6 @@ public class StatusUI : MonoBehaviour
     }
     private void OnGUI()
     {
-        text.text = $"_______\nammo>{10}\nhp__>{Player.Singleton?.Health.ToString("D2") ?? "00"}\n_______\n";
+        text.text = $"_______\nammo>{(Player.Singleton?.Ammo.ToString("D2")) ?? "00"}\nhp__>{(Player.Singleton?.Health.ToString("D2")) ?? "00"}\n_______\n";
     }
 }
