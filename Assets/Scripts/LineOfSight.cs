@@ -42,7 +42,7 @@ public class LineOfSight : MonoBehaviour
     /// <returns>Returns true if the target is on sight. Whatever is it behind or not.</returns>
     private bool Find(Player target)
     {
-        float dist = Vector2.Distance(transform.position, target.transform.position);
+        float dist = 25f;
         Vector2 direction = target.transform.position - transform.position;
         int layers = mask;
         RaycastHit2D ray = Physics2D.Raycast(transform.position, direction, dist, layers);

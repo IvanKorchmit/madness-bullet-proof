@@ -41,7 +41,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
             currentWeapon = value;
         }
     }
-    [SerializeField] private LayerMask meleeLayerMask;
+    [SerializeField] protected LayerMask meleeLayerMask;
     private Vector2 aimDirection;
     private int ammo;
     public int Ammo
@@ -222,8 +222,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         }
         else if (!isWakingUp)
         {
-            controller.Move(0, false, false);
-            if (!IsFalling)
+                if (!IsFalling)
             {
                 knockedOutTime -= Time.deltaTime;
                 if (isKnockedOut && knockedOutTime <= 0)
@@ -437,7 +436,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         Vector2 direction = transform.position - damager.transform.position;
         rb.velocity = new Vector2();
-        rb.position += Vector2.up * 1.5f;
+        rb.position += Vector2.up * 0.8f;
         rb.AddForce(new Vector2((direction.x >= 0f ? 1f : -1f) * 5f, 10f), ForceMode2D.Impulse);
     }
 
