@@ -152,7 +152,7 @@ MonoBehaviour:
   stamina: 3
   speed: 0.75
   mainCollider: {fileID: 5428329920567092903}
-  health: 3
+  health: 6
   spotDistance: 10
 --- !u!114 &5428329920567092897
 MonoBehaviour:
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_AirControl: 1
   m_WhatIsGround:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 1344
   m_GroundCheck: {fileID: 5428329920720244404}
   m_CeilingCheck: {fileID: 5428329920781289716}
   m_CrouchDisableCollider: {fileID: 5428329920567092903}
@@ -253,7 +253,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.71
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -261,10 +261,10 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
+  MinDistance: 10
+  MaxDistance: 15
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -297,7 +297,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

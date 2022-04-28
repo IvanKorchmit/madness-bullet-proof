@@ -9,7 +9,16 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #endregion
 
     [SerializeField] private GameObject bloodParticle;
-    public int Health => health;
+    public int Health {
+    get
+        {
+            return health;
+        }
+    set
+        {
+            health = value;
+        }
+    }
     #region Animation const
     public const string IS_MOVING = "isMoving";
     public const string IS_FALLING = "isFalling";
@@ -73,6 +82,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     #region Properties
     protected CharacterController2D Controller => controller;
     protected Animator EntityAnimator => animator;
+    protected Rigidbody2D RB => rb;
     public AudioSource Audio => audioSource;
     [SerializeField] protected float speed;
     private bool isJumping;
@@ -286,14 +296,17 @@ public abstract class Entity : MonoBehaviour, IDamagable
     {
         if (isKnockedOut) return;
         hasAttacked = false;
-        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 2f, movement, 1f, meleeLayerMask);
-        if (hit.collider != null)
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 2f, movement, 1f, meleeLayerMask);
+        foreach (var hit in hits)
         {
-            if (hit.collider.TryGetComponent(out IDamagable damage))
+            if (hit.collider != null)
             {
-                if (damage.Damage(this, 1))
+                if (hit.collider.TryGetComponent(out IDamagable damage))
                 {
-                    onEntityPunch?.Invoke();
+                    if (damage.Damage(this, 1))
+                    {
+                        onEntityPunch?.Invoke();
+                    }
                 }
             }
         }

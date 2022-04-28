@@ -5,7 +5,6 @@ public class Player : Entity
     [SerializeField] private AudioClip doubleJumpSound;
     private static Player _instance;
     public static Player Singleton => _instance;
-    private float airTime;
     protected override void Start()
     {
         base.Start();
@@ -15,7 +14,7 @@ public class Player : Entity
 
     private void Player_onEntityLand()
     {
-        if (airTime > 3f)
+        if (RB.velocity.magnitude > 35f)
         {
             var stomp = Physics2D.CircleCastAll(transform.position, 3f, new Vector2(), 0, meleeLayerMask);
             foreach (var item in stomp)
@@ -24,12 +23,11 @@ public class Player : Entity
                 {
                     if (item.collider.TryGetComponent(out IDamagable damage))
                     {
-                        damage.Damage(this, Mathf.RoundToInt(airTime));
+                        damage.Damage(this, Mathf.RoundToInt(RB.velocity.magnitude / 10));
                     }
                 }
             }
         }
-        airTime = 0;
     }
 
     public void SetWeapon(WeaponBase w, int ammo)
@@ -53,7 +51,6 @@ public class Player : Entity
         Audio.PlayOneShot(doubleJumpSound);
         EntityAnimator.SetTrigger(JUMP_TRIGGER);
     }
-
     protected override void Update()
     {
         base.Update();
@@ -63,13 +60,32 @@ public class Player : Entity
         Aim(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
         if (Input.GetKey(KeyCode.Return)) Attack();
         if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift)) JumpOff();
-        if (IsFalling)
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            airTime += Time.deltaTime * 2.5f;
+            var interact = Physics2D.CircleCastAll(transform.position, 3f, new Vector2(), 0);
+            foreach (var item in interact)
+            {
+                if (item)
+                {
+                    if (item.collider.TryGetComponent(out IInteractable interInstance))
+                    {
+                        if (interInstance.IsInteractable)
+                        {
+                            interInstance.Interact();
+                        }
+                    }
+                }
+            }
         }
     }
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
     }
+}
+
+public interface IInteractable
+{
+    bool IsInteractable { get; }
+    void Interact();
 }

@@ -5,8 +5,9 @@ using UnityEngine;
 public class Glass : MonoBehaviour, IDamagable
 {
     [SerializeField] private GameObject glassShards;
+    private BoxCollider2D boxCollider;
     private bool isBroken;
-    public bool IsVulnerable => throw new System.NotImplementedException();
+    public bool IsVulnerable => false;
     public void InstantKill()
     {
         Break();
@@ -14,7 +15,16 @@ public class Glass : MonoBehaviour, IDamagable
     // Start is called before the first frame update
     void Start()
     {
-        GetComponent<BoxCollider2D>().size = GetComponent<SpriteRenderer>().size;
+        BoxCollider2D[] colliders = GetComponents<BoxCollider2D>();
+        SpriteRenderer sp = GetComponent<SpriteRenderer>();
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            colliders[i].size = sp.size;
+            if (colliders[i].isTrigger)
+            {
+                boxCollider = colliders[i];
+            }
+        }
     }
     private void Break()
     {
@@ -30,13 +40,27 @@ public class Glass : MonoBehaviour, IDamagable
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-       
+
         if (collision.CompareTag("Player"))
         {
-            Break();
+            if (collision.attachedRigidbody.velocity.magnitude > 12f)
+            {
+                Debug.Log(collision.attachedRigidbody.velocity.magnitude);
+                Break();
+            }
+            else
+            {
+                boxCollider.isTrigger = false;
+            }
         }
     }
-
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            boxCollider.isTrigger = true;
+        }
+    }
     public bool Damage(Entity damager, int damage)
     {
 

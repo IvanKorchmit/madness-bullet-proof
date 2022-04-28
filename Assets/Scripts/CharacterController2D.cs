@@ -72,10 +72,10 @@ public class CharacterController2D : MonoBehaviour
             {
                 m_Grounded = true;
                 alreadyPerformedDoubleJump = false;
-                if (!wasGrounded)
-                {
-                    OnLandEvent.Invoke();
-                }
+				if (!wasGrounded)
+				{
+						OnLandEvent.Invoke();
+				}
             }
         }
     }

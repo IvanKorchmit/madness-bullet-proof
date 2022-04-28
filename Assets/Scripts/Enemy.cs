@@ -85,10 +85,15 @@ public class Enemy : Entity
 
         void TryJump(Player target)
         {
+            
             if (hasSpotted && canJump && !IsMoving && target.transform.position.y > transform.position.y + 5f)
             {
                 Jump(true);
                 canJump = false;
+            }
+            else if (hasSpotted && canJump && !IsMoving && target.transform.position.y < transform.position.y - 2.5f)
+            {
+                JumpOff();
             }
             else
             {
