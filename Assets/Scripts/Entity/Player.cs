@@ -10,6 +10,22 @@ public class Player : Entity
         base.Start();
         Controller.OnDoubleJumpEvent.AddListener(OnPlayerDoubleJump);
         onEntityLand += Player_onEntityLand;
+        onEntityWakeUp += Player_onEntityWakeUp;
+        onEntityKnockout += Player_onEntityKnockout;
+    }
+
+    private void Player_onEntityKnockout()
+    {
+        immune = true;
+    }
+
+    private void Player_onEntityWakeUp()
+    {
+        void ResetImmune()
+        {
+            immune = false;
+        }
+        TimerUtils.AddTimer(1.5f, ResetImmune);
     }
 
     private void Player_onEntityLand()

@@ -91,7 +91,7 @@ public class Enemy : Entity
                 Jump(true);
                 canJump = false;
             }
-            else if (hasSpotted && canJump && !IsMoving && target.transform.position.y < transform.position.y - 2.5f)
+            else if (hasSpotted && canJump && !IsMoving && target.transform.position.y < transform.position.y)
             {
                 JumpOff();
             }

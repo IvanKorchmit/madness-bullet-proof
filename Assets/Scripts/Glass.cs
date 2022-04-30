@@ -7,7 +7,7 @@ public class Glass : MonoBehaviour, IDamagable
     [SerializeField] private GameObject glassShards;
     private BoxCollider2D boxCollider;
     private bool isBroken;
-    public bool IsVulnerable => false;
+    public bool IsUndamagable => false;
     public void InstantKill()
     {
         Break();
@@ -61,7 +61,7 @@ public class Glass : MonoBehaviour, IDamagable
             boxCollider.isTrigger = true;
         }
     }
-    public bool Damage(Entity damager, int damage)
+    public bool Damage(IHitter damager, int damage)
     {
 
         Break();

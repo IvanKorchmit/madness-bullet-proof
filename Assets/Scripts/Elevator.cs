@@ -10,6 +10,11 @@ public class Elevator : MonoBehaviour
     private float elapsedTime;
     public void MoveTo(Transform target)
     {
+        Vector2 targetPos = currentTarget != null ? new Vector2(transform.position.x, currentTarget.position.y) : (Vector2)transform.position;
+        if ((Vector2)transform.position != targetPos)
+        {
+            return;
+        }
         start = currentTarget == null ? (Vector2)transform.position : new Vector2(transform.position.x, currentTarget.position.y);
         currentTarget = target;
         elapsedTime = 0;

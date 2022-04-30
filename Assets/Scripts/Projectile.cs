@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    private Entity owner;
+    private IHitter owner;
     private Vector2 startPosition;
     private enum TrajectoryType
     {
@@ -27,7 +27,7 @@ public class Projectile : MonoBehaviour
         pos = rb.position;
         startPosition = transform.position;
     }
-    public Projectile Init(Entity owner)
+    public Projectile Init(IHitter owner)
     {
         this.owner = owner;
         return this;
@@ -56,7 +56,7 @@ public class Projectile : MonoBehaviour
 
         if (!ignore && owner != null && owner.gameObject != collision.gameObject && collision.TryGetComponent(out IDamagable damage))
         {
-            damage.Damage(owner, 1);
+            damage.Damage(owner, 2);
             Destroy(gameObject);
         }
     }

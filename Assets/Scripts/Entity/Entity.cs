@@ -1,5 +1,5 @@
 using UnityEngine;
-public abstract class Entity : MonoBehaviour, IDamagable
+public abstract class Entity : MonoBehaviour, IDamagable, IHitter
 {
     #region SFX
     [SerializeField] private AudioClip landSound;
@@ -33,8 +33,8 @@ public abstract class Entity : MonoBehaviour, IDamagable
     public const string WAKEUP_TRIGGER = "WakeUp";
     public const string RECOVER_TRIGGER = "Recover";
     #endregion
-    private bool immune;
-    public bool IsVulnerable => isKnockedOut || isWakingUp;
+    protected bool immune;
+    public bool IsUndamagable => isKnockedOut || isWakingUp;
     private bool isStunned;
     private bool hasAttacked;
     #region Combat
@@ -129,16 +129,11 @@ public abstract class Entity : MonoBehaviour, IDamagable
     }
     private void Entity_onEntityWakeUp()
     {
-        void ResetImmune()
-        {
-            immune = false;
-        }
         animator.SetTrigger(WAKEUP_TRIGGER);
         isKnockedOut = false;
         isStunned = false;
         isWakingUp = false;
         hasAttacked = false;
-        TimerUtils.AddTimer(1.5f, ResetImmune);
     }
 
     private void Entity_onEntityKnockout()
@@ -171,6 +166,10 @@ public abstract class Entity : MonoBehaviour, IDamagable
                 }
                 TimerUtils.AddTimer(1f, Back);
                 break;
+            }
+            else if (hits[i].CompareTag("Glass"))
+            {
+                hits[i].GetComponent<IDamagable>().Damage(this, 1);
             }
         }
     }
@@ -371,7 +370,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
     private float knockedOutTime;
     private int numberOfHits;
     private int numberOfHitsStunned;
-    public bool Damage(Entity damager, int damage)
+    public bool Damage(IHitter damager, int damage)
     {
         void Stun()
         {
@@ -382,13 +381,12 @@ public abstract class Entity : MonoBehaviour, IDamagable
         {
             Destroy(gameObject,1.75f);
             KnockOut(damager);
-
         }
-        if (isKnockedOut && damager != this)
+        if (isKnockedOut && (damager is Entity ent && ent != this))
         {
             if (numberOfHitsStunned < 4)
             {
-                Push(damager);
+                Push(ent);
                 numberOfHitsStunned++;
                 Instantiate(bloodParticle, transform.position, Quaternion.identity);
 
@@ -396,7 +394,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
             }
             return false;
         }
-        if (IsVulnerable || immune) return false;
+        if (IsUndamagable || immune) return false;
         numberOfHits += damage;
         health -= damage;
         if (numberOfHits >= stamina)
@@ -424,7 +422,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
         isStunned = false;
         onEntityRecover?.Invoke();
     }
-    private void KnockOut(Entity damager)
+    private void KnockOut(IHitter damager)
     {
 #if UNITY_EDITOR
         try
@@ -445,7 +443,7 @@ public abstract class Entity : MonoBehaviour, IDamagable
 #endif
     }
 
-    private void Push(Entity damager)
+    private void Push(IHitter damager)
     {
         Vector2 direction = transform.position - damager.transform.position;
         rb.velocity = new Vector2();
@@ -458,20 +456,24 @@ public abstract class Entity : MonoBehaviour, IDamagable
         isKnockedOut = false;
         isWakingUp = true;
         numberOfHitsStunned = 0;
-        immune = true;
         onEntityWakeUp?.Invoke();
     }
 }
 
 
-interface IDamagable
+public interface IDamagable
 {
     /// <summary>
     /// Apply damage
     /// </summary>
     /// <param name="damager">Who did the damage?</param>
     /// <param name="damage">The amount of damage</param>
-    bool Damage(Entity damager, int damage);
+    bool Damage(IHitter damager, int damage);
     void InstantKill();
-    bool IsVulnerable { get; }
+    bool IsUndamagable { get; }
+}
+public interface IHitter : IDamagable
+{
+    Transform transform { get; }
+    GameObject gameObject { get; }
 }
