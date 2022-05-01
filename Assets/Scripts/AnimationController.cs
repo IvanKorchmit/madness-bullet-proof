@@ -12,6 +12,10 @@ public class AnimationController : MonoBehaviour
         reference.Stop();
         reference.PlayOneShot(clip);
     }
+    public void PlayContinious(AudioClip clip)
+    {
+        reference.PlayOneShot(clip);
+    }
     public void SpawnExplosion(string name)
     {
         Transform reference = transform.Find(name);

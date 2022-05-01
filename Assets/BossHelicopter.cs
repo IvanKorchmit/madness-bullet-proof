@@ -5,17 +5,21 @@ using UnityEngine;
 public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
 {
     public bool undamagable;
+    private bool alreadyInRage;
     [SerializeField] private int health = 50;
     public bool IsUndamagable => undamagable;
     private Animator animator;
     [SerializeField] private GameObject projectile;
+    [SerializeField] private GameObject missle;
     [SerializeField] private GameObject[] enemies;
     [SerializeField] private GameObject explosionPrefab;
     [SerializeField] private Transform[] explosionTransforms;
+    private int initHealth;
     private void Start()
     {
         animator = GetComponent<Animator>();
         GetComponentInChildren<ParticleSystem>().Pause();
+        initHealth = health;
 
     }
 
@@ -26,6 +30,11 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
             return false;
         }
         health -= damage;
+        if (!alreadyInRage && health <= initHealth / 4)
+        {
+            alreadyInRage = true;
+            animator.SetTrigger("Rage");
+        }
         if (health <= 0)
         {
             GetComponentInChildren<ParticleSystem>().Play();
@@ -48,17 +57,21 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
     }
     public void ShootRight()
     {
-        Shoot(Vector2.right);
+        Shoot(Vector2.right, projectile);
+    }
+    public void ShootMissle()
+    {
+        Shoot(Vector2.right, missle);
     }
     public void ShootDuwn()
     {
-        Shoot(Vector2.down);
+        Shoot(Vector2.down, projectile);
     }
-    private void Shoot(Vector2 direction)
+    private void Shoot(Vector2 direction, GameObject prefab)
     {
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Transform sp = transform.Find("ShootPoint");
-        Instantiate(projectile, sp.position, Quaternion.Euler(0,0,angle)).GetComponent<Projectile>().Init(this);
+        Instantiate(prefab, sp.position, Quaternion.Euler(0,0,angle)).GetComponent<Projectile>().Init(this);
     }
     public void Explosion()
     {

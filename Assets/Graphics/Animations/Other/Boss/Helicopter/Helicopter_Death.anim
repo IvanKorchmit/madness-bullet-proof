@@ -1004,6 +1004,13 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
+  - time: 0
+    functionName: PlayContinious
+    data: 
+    objectReferenceParameter: {fileID: 8300000, guid: 980621edf1211074ca2988bb387b9865, type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 0.16666667
     functionName: Explosion
     data: 

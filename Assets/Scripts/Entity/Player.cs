@@ -57,6 +57,7 @@ public class Player : Entity
             CurrentWeapon = w;
             Ammo = ammo;
         }
+        weaponVisuals.enabled = CurrentWeapon != null;
     }
     private void Awake()
     {

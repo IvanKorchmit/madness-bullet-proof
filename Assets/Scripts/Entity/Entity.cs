@@ -99,7 +99,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
     private AudioSource audioSource;
     private Animator animator;
     private Rigidbody2D rb;
-    private SpriteRenderer weaponVisuals;
+    protected SpriteRenderer weaponVisuals;
     private SpriteRenderer visuals;
     [SerializeField] private Collider2D mainCollider;
     #endregion
@@ -119,6 +119,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
         onEntityKnockout += Entity_onEntityKnockout;
         onEntityWakeUp += Entity_onEntityWakeUp;
         weaponVisuals = transform.Find("Weapon").GetComponentInChildren<SpriteRenderer>();
+        weaponVisuals.enabled = currentWeapon != null;
         visuals = transform.Find("Visual").GetComponent<SpriteRenderer>();
     }
 
@@ -134,12 +135,17 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
         isStunned = false;
         isWakingUp = false;
         hasAttacked = false;
+        TimerUtils.AddTimer(0.5f, () =>
+        {
+            weaponVisuals.enabled = CurrentWeapon != null;
+        });
     }
 
     private void Entity_onEntityKnockout()
     {
         isWakingUp = false;
         hasAttacked = false;
+        weaponVisuals.enabled = false;
         isStunned = false;
         animator.SetTrigger(KNOCKOUT_TRIGGER);
 
@@ -255,14 +261,6 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
         }
         animator.SetBool(IS_KNOCKED_OUT, isKnockedOut);
         animator.SetBool(HAS_FIREARM, currentWeapon != null && currentWeapon is Firearm);
-        if (currentWeapon == null)
-        {
-            weaponVisuals.enabled = false;
-        }
-        else
-        {
-            weaponVisuals.enabled = true;
-        }
     }
     #endregion
     #region Movement Methods
@@ -319,6 +317,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
             if (currentWeapon != null && currentWeapon is Firearm && ammo <= 0)
             {
                 currentWeapon = null;
+                weaponVisuals.enabled = false;
                 return;
             }
             currentWeapon?.Attack(this, aimDirection);
