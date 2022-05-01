@@ -5,6 +5,7 @@ public class Player : Entity
     [SerializeField] private AudioClip doubleJumpSound;
     private static Player _instance;
     public static Player Singleton => _instance;
+    public WeaponBase PlayerWeapon => CurrentWeapon;
     protected override void Start()
     {
         base.Start();

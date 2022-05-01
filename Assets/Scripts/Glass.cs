@@ -45,7 +45,6 @@ public class Glass : MonoBehaviour, IDamagable
         {
             if (collision.attachedRigidbody.velocity.magnitude > 12f)
             {
-                Debug.Log(collision.attachedRigidbody.velocity.magnitude);
                 Break();
             }
             else

@@ -64,7 +64,6 @@ public class Projectile : MonoBehaviour
                 Vector2 direction = (Vector2)target.transform.position - rb.position;
                 direction.Normalize();
                 float rotAmount = Vector3.Cross(direction, transform.right).z;
-                Debug.Log(rotAmount);
                 rb.velocity = transform.right * speed;
 
                 rb.angularVelocity = -rotAmount * turnSpeed;
@@ -77,6 +76,15 @@ public class Projectile : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (owner == null || collision == null)
+        {
+            if (trajectoryType == TrajectoryType.Homing)
+            {
+                Instantiate(explosion, transform.position, Quaternion.identity);
+            }
+            Destroy(gameObject);
+            return;
+        }
         if (collision.CompareTag("Obstacle"))
         {
             if (trajectoryType == TrajectoryType.Homing)
@@ -84,6 +92,7 @@ public class Projectile : MonoBehaviour
                 Instantiate(explosion, transform.position, Quaternion.identity);
             }
             Destroy(gameObject);
+            return;
         }
 
         bool ignore = (owner as Enemy) != null && collision.GetComponent<Entity>() is Enemy;
@@ -97,6 +106,7 @@ public class Projectile : MonoBehaviour
                 Instantiate(explosion, transform.position, Quaternion.identity);
             }
             Destroy(gameObject);
+            return;
         }
     }
     private void Update()

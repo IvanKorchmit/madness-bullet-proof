@@ -379,7 +379,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
         void Death ()
         {
             Destroy(gameObject,1.75f);
-            KnockOut(damager);
+            KnockOut(damager, this is Player ? 0.5f : 1f);
         }
         if (isKnockedOut && (damager is Entity ent && ent != this))
         {
@@ -398,7 +398,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
         health -= damage;
         if (numberOfHits >= stamina)
         {
-            KnockOut(damager);
+            KnockOut(damager, this is Player ? 0.5f : 1f);
         }
         else
         {
@@ -421,14 +421,14 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
         isStunned = false;
         onEntityRecover?.Invoke();
     }
-    private void KnockOut(IHitter damager)
+    private void KnockOut(IHitter damager, float time)
     {
 #if UNITY_EDITOR
         try
         {
 #endif
             isWakingUp = false;
-            knockedOutTime =  !isKnockedOut ? 3f : knockedOutTime;
+            knockedOutTime =  !isKnockedOut ? time : knockedOutTime;
             numberOfHits = 0;
             isKnockedOut = true;
             Push(damager);
