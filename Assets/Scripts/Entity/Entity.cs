@@ -23,6 +23,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
     public const string IS_MOVING = "isMoving";
     public const string IS_FALLING = "isFalling";
     public const string IS_KNOCKED_OUT = "isKnockedOut";
+    public const string IS_WAKING_UP = "isWakingUp";
     public const string HAS_FIREARM = "hasFirearm";
     public const string JUMP_TRIGGER = "Jump";
     public const string ATTACK_TRIGGER = "Attack";
@@ -30,7 +31,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
     public const string DAMAGE_TRIGGER = "Damage";
     public const string LAND_TRIGGER = "Land";
     public const string KNOCKOUT_TRIGGER = "Knockout";
-    public const string WAKEUP_TRIGGER = "WakeUp";
+    public const string WAKE_UP_TRIGGER = "WakeUp";
     public const string RECOVER_TRIGGER = "Recover";
     #endregion
     protected bool immune;
@@ -130,7 +131,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
     }
     private void Entity_onEntityWakeUp()
     {
-        animator.SetTrigger(WAKEUP_TRIGGER);
+        animator.SetTrigger(WAKE_UP_TRIGGER);
         isKnockedOut = false;
         isStunned = false;
         isWakingUp = false;
@@ -190,9 +191,12 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
 
     private void Entity_onEntityStun()
     {
-        animator.SetTrigger(STUN_TRIGGER);
-        isWakingUp = false;
-        hasAttacked = false;
+        if (!isKnockedOut)
+        {
+            animator.SetTrigger(STUN_TRIGGER);
+            isWakingUp = false;
+            hasAttacked = false;
+        }
     }
 
     protected virtual void Entity_onEntityAttack()
@@ -260,6 +264,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
             hasAttacked = false;
         }
         animator.SetBool(IS_KNOCKED_OUT, isKnockedOut);
+        animator.SetBool(IS_WAKING_UP, isWakingUp);
         animator.SetBool(HAS_FIREARM, currentWeapon != null && currentWeapon is Firearm);
     }
     #endregion
@@ -270,7 +275,7 @@ public abstract class Entity : MonoBehaviour, IDamagable, IHitter
     /// <param name="direction"></param>
     protected void Move(float direction)
     {
-        if (isKnockedOut || isStunned || isWakingUp || animator.GetCurrentAnimatorStateInfo(0).IsTag("NoMove"))
+        if (animator.GetCurrentAnimatorStateInfo(0).IsTag("NoMove"))
         {
             movement.x = 0;
             return;
