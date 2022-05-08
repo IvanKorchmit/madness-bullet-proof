@@ -53,6 +53,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e8eea9dfc19f9448a5a6e756c04fac0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentWeapon: {fileID: 0}
+  meleeLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  stamina: 10
+  health: 25
+  state: 0
   landSound: {fileID: 8300000, guid: 8c7ddf9c733054842b1b0e6c602c2411, type: 3}
   jumpSound: {fileID: 8300000, guid: 922906987733a2e418cb0ff4e8b43914, type: 3}
   defaultPunchSound: {fileID: 8300000, guid: 69713b2f504ced3439dbeac9a58c1cbd, type: 3}
@@ -62,15 +69,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4562cb875df910d4c8af50b86236c39d, type: 3}
   - {fileID: 8300000, guid: 5c70cdcaa3164d346addd63ad7e640db, type: 3}
   bloodParticle: {fileID: 4064601403574583529, guid: 924557a812f40504bbec687837b04792, type: 3}
-  currentWeapon: {fileID: 0}
-  meleeLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  stamina: 10
   speed: 1
   mainCollider: {fileID: 682538038269235078}
-  health: 25
   doubleJumpSound: {fileID: 8300000, guid: bdea68639dfd5654a93b7a60c5c10cd0, type: 3}
+  grenadePrefab: {fileID: 7881337918574641360, guid: d86893ec5ddeb164184d97b745728609, type: 3}
 --- !u!114 &682538038269235072
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,7 +15,7 @@ public class Player : Entity
         Controller.OnDoubleJumpEvent.AddListener(OnPlayerDoubleJump);
         onEntityLand += Player_onEntityLand;
         onEntityWakeUp += () => TimerUtils.AddTimer(1.5f, () => state = FlagUtils.State_Remove(state, EntityState.IsImmune));
-        onEntityKnockout += ()=> state = FlagUtils.State_Add(state, EntityState.IsImmune);
+        onEntityKnockout += () => state = FlagUtils.State_Add(state, EntityState.IsImmune);
     }
 
     private void Player_onEntityLand()
@@ -58,6 +58,11 @@ public class Player : Entity
         Audio.PlayOneShot(doubleJumpSound);
         EntityAnimator.SetTrigger(EntityAnimationConsts.JUMP_TRIGGER);
     }
+    private void ThrowGrenade()
+    {
+        var gren = Instantiate(grenadePrefab, transform.position, Quaternion.identity);
+
+    }
     protected override void Update()
     {
         base.Update();
@@ -91,6 +96,7 @@ public class Player : Entity
         void Attack()
         {
             if (Input.GetKey(KeyCode.Return)) base.Attack();
+            if (Input.GetKeyDown(KeyCode.Slash)) ThrowGrenade();
         }
         #endregion
     }
