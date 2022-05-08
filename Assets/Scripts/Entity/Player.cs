@@ -6,27 +6,16 @@ public class Player : Entity
     private static Player _instance;
     public static Player Singleton => _instance;
     public WeaponBase PlayerWeapon => CurrentWeapon;
+    private int grenades;
+    public int Grenads => grenades;
+    [SerializeField] private GameObject grenadePrefab;
     protected override void Start()
     {
         base.Start();
         Controller.OnDoubleJumpEvent.AddListener(OnPlayerDoubleJump);
         onEntityLand += Player_onEntityLand;
-        onEntityWakeUp += Player_onEntityWakeUp;
-        onEntityKnockout += Player_onEntityKnockout;
-    }
-
-    private void Player_onEntityKnockout()
-    {
-        immune = true;
-    }
-
-    private void Player_onEntityWakeUp()
-    {
-        void ResetImmune()
-        {
-            immune = false;
-        }
-        TimerUtils.AddTimer(1.5f, ResetImmune);
+        onEntityWakeUp += () => TimerUtils.AddTimer(1.5f, () => state = FlagUtils.State_Remove(state, EntityState.IsImmune));
+        onEntityKnockout += ()=> state = FlagUtils.State_Add(state, EntityState.IsImmune);
     }
 
     private void Player_onEntityLand()
@@ -67,43 +56,46 @@ public class Player : Entity
     private void OnPlayerDoubleJump()
     {
         Audio.PlayOneShot(doubleJumpSound);
-        EntityAnimator.SetTrigger(JUMP_TRIGGER);
+        EntityAnimator.SetTrigger(EntityAnimationConsts.JUMP_TRIGGER);
     }
     protected override void Update()
     {
         base.Update();
-        Move(Input.GetAxisRaw("Horizontal"));
-        Jump(Input.GetKeyDown(KeyCode.Space) && !Input.GetKey(KeyCode.LeftShift));
-        Crounch(Input.GetKey(KeyCode.LeftShift));
+        BasicMovement();
         Aim(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
-        if (Input.GetKey(KeyCode.Return)) Attack();
-        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift)) JumpOff();
-        if (Input.GetKeyDown(KeyCode.E))
+        Attack();
+        Interact();
+        #region Local Funcs
+
+        void Interact()
         {
+            if (!Input.GetKeyDown(KeyCode.E)) return;
             var interact = Physics2D.CircleCastAll(transform.position, 3f, new Vector2(), 0);
             foreach (var item in interact)
             {
-                if (item)
+                if (item && item.collider.TryGetComponent(out IInteractable interInstance) && interInstance.IsInteractable)
                 {
-                    if (item.collider.TryGetComponent(out IInteractable interInstance))
-                    {
-                        if (interInstance.IsInteractable)
-                        {
-                            interInstance.Interact();
-                        }
-                    }
+                    interInstance.Interact();
                 }
             }
         }
+
+        void BasicMovement()
+        {
+            Move(Input.GetAxisRaw("Horizontal"));
+            Jump(Input.GetKeyDown(KeyCode.Space) && !Input.GetKey(KeyCode.LeftShift));
+            if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift)) JumpOff();
+            Crounch(Input.GetKey(KeyCode.LeftShift));
+        }
+
+        void Attack()
+        {
+            if (Input.GetKey(KeyCode.Return)) base.Attack();
+        }
+        #endregion
     }
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
     }
-}
-
-public interface IInteractable
-{
-    bool IsInteractable { get; }
-    void Interact();
 }

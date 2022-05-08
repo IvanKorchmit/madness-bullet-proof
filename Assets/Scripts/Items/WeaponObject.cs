@@ -22,7 +22,6 @@ public class WeaponObject : MonoBehaviour
                 hasPicked = true;
                 p.SetWeapon(weapon, ammo);
                 Destroy(gameObject);
-                Debug.Log(ammo);
             }
         }
     }

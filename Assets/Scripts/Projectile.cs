@@ -58,6 +58,15 @@ public class Projectile : MonoBehaviour
         }
         else if (trajectoryType == TrajectoryType.Homing)
         {
+            HomingMissle();
+        }
+        if (trajectoryType != TrajectoryType.Homing && Vector2.Distance(startPosition, transform.position) >= 15)
+        {
+            Destroy(gameObject);
+        }
+
+        void HomingMissle()
+        {
             Player target = Player.Singleton;
             if (target != null)
             {
@@ -68,10 +77,6 @@ public class Projectile : MonoBehaviour
 
                 rb.angularVelocity = -rotAmount * turnSpeed;
             }
-        }
-        if (trajectoryType != TrajectoryType.Homing && Vector2.Distance(startPosition, transform.position) >= 15)
-        {
-            Destroy(gameObject);
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -98,7 +103,8 @@ public class Projectile : MonoBehaviour
         bool ignore = (owner as Enemy) != null && collision.GetComponent<Entity>() is Enemy;
 
 
-        if (!ignore && !System.Object.Equals(owner, null) && owner.gameObject != collision.gameObject && collision.TryGetComponent(out IDamagable damage))
+        if (!ignore && !System.Object.Equals(owner, null) && 
+            owner.gameObject != collision.gameObject && collision.TryGetComponent(out IDamagable damage))
         {
             damage.Damage(owner, this.damage);
             if (trajectoryType == TrajectoryType.Homing)

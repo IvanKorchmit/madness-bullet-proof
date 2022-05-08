@@ -1,11 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Events;
 public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
 {
+
+    public UnityEvent onHelicopterDeath;
+
+
+
+
+
+
+    private bool alreadyDying;
     public bool undamagable;
     private bool alreadyInRage;
+
     [SerializeField] private int health = 50;
     public bool IsUndamagable => undamagable;
     private Animator animator;
@@ -35,34 +45,21 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
             alreadyInRage = true;
             animator.SetTrigger("Rage");
         }
-        if (health <= 0)
+        if (health <= 0 && !alreadyDying)
         {
             GetComponentInChildren<ParticleSystem>().Play();
+            alreadyDying = true;
+            onHelicopterDeath?.Invoke();
         }
         return true;
     }
-    private void Update()
-    {
-        animator.SetInteger("Health", health);
-    }
+    private void Update() => animator.SetInteger("Health", health);
 
-    public void InstantKill()
-    {
-        return;
-    }
+    public void InstantKill() { return; }
 
-   public void SpawnEnemy()
-    {
-        Instantiate(enemies[Random.Range(0, enemies.Length)], transform.position, Quaternion.identity);
-    }
-    public void ShootRight()
-    {
-        Shoot(Vector2.right, projectile);
-    }
-    public void ShootMissle()
-    {
-        Shoot(Vector2.right, missle);
-    }
+    public void SpawnEnemy() => Instantiate(enemies[Random.Range(0, enemies.Length)], transform.position, Quaternion.identity);
+    public void ShootRight() => Shoot(Vector2.right, projectile);
+    public void ShootMissle() => Shoot(Vector2.right, missle);
     public void ShootDuwn()
     {
         Shoot(Vector2.down, projectile);

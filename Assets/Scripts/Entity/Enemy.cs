@@ -11,36 +11,20 @@ public class Enemy : Entity
 
     private LineOfSight los;
 
-    protected override void FixedUpdate()
-    {
-        base.FixedUpdate();
-    }
+    protected override void FixedUpdate() => base.FixedUpdate();
     protected override void Start()
     {
         base.Start();
         onEntityLand += Enemy_onEntityLand;
-        onEntityPunch += Enemy_onEntityPunch;
+        onEntityPunch += ()=> shoots++;
+        onEntityAttack += ()=> shoots++;
         canJump = true;
         SetRandomPatrol();
         los = GetComponent<LineOfSight>();
-        los.onPlayerSpot += Los_onPlayerSpot;
+        los.onPlayerSpot += ()=> hasSpotted = true;
         speed *= Random.Range(0.8f, 1.8f);
         Ammo = 25;
     }
-
-    private void Los_onPlayerSpot()
-    {
-        if (!hasSpotted)
-        {
-            hasSpotted = true;
-        }
-    }
-
-    private void Enemy_onEntityPunch()
-    {
-        shoots++;
-    }
-
     private void Enemy_onEntityLand()
     {
         canJump = true;
@@ -117,10 +101,6 @@ public class Enemy : Entity
     }
     private bool CanAttack()
     {
-        void ResetShoots()
-        {
-            shoots = 0;
-        }
         if (Vector2.Distance(Player.Singleton.transform.position, transform.position) <= spotDistance)
         {
             if (shoots < 3)
@@ -129,16 +109,9 @@ public class Enemy : Entity
             }
             else
             {
-                TimerUtils.AddTimer(1f, ResetShoots);
+                TimerUtils.AddTimer(1f, ()=> shoots = 0);
             }
         }
-
-
         return false;
-    }
-    protected override void Entity_onEntityAttack()
-    {
-        base.Entity_onEntityAttack();
-        shoots++;
     }
 }
