@@ -37,10 +37,10 @@ public class Grenade : MonoBehaviour, IHitter
             {
                 damage.Damage(this, 5);
             }
-            var eff = Instantiate(effector, transform.position, Quaternion.identity);
-            Instantiate(explosion, transform.position, Quaternion.identity);
-            Object.Destroy(eff, 0.5f);
         }
+            var eff = Instantiate(effector, transform.position, Quaternion.identity);
+            Object.Destroy(eff, 0.5f);
+            Instantiate(explosion, transform.position, Quaternion.identity);
         hasAlreadyExplode = true;
         Destroy(gameObject, 0.5f);
     }
