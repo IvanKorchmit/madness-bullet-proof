@@ -103,7 +103,7 @@ public class Projectile : MonoBehaviour
         bool ignore = (owner as Enemy) != null && collision.GetComponent<Entity>() is Enemy;
 
 
-        if (!ignore && !System.Object.Equals(owner, null) && 
+        if (!ignore && collision != null && owner != null && 
             owner.gameObject != collision.gameObject && collision.TryGetComponent(out IDamagable damage))
         {
             damage.Damage(owner, this.damage);

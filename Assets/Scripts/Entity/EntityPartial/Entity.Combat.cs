@@ -69,7 +69,7 @@ public abstract partial class Entity : MonoBehaviour, IDamagable, IHitter
         }
         void Death()
         {
-            Destroy(gameObject, 1.75f);
+            gameObject.SetActive(false);
             KnockOut(damager, this is Player ? 0.5f : 1f);
         }
         bool isKnockedOut = FlagUtils.State_Has(state, EntityState.IsKnockedOut);

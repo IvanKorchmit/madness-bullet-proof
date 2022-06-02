@@ -10,6 +10,9 @@ public partial class Entity
         }
         movement.x = direction;
     }
+
+    public SpriteRenderer Visuals => visuals;
+
     protected void Jump(bool isTrue)
     {
         if (FlagUtils.State_Has(state, EntityState.IsKnockedOut)) return;

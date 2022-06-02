@@ -69,7 +69,7 @@ public abstract partial class Entity : MonoBehaviour, IDamagable, IHitter
         weaponVisuals = transform.Find("Weapon").GetComponentInChildren<SpriteRenderer>();
         weaponVisuals.enabled = currentWeapon != null;
         visuals = transform.Find("Visual").GetComponent<SpriteRenderer>();
-
+        
         void SubscribeToEvents()
         {
             controller.OnLandEvent.AddListener(Entity_onEntityLand);
@@ -96,6 +96,7 @@ public abstract partial class Entity : MonoBehaviour, IDamagable, IHitter
     #endregion
     protected virtual void Update()
     {
+            weaponVisuals.gameObject.SetActive(!FlagUtils.State_Has(state, EntityState.IsKnockedOut));
         if (!FlagUtils.State_Has(state, EntityState.IsKnockedOut, EntityState.IsStunned, EntityState.IsWakingUp))
         {
             controller.Move(movement.x * speed, crounch, isJumping);

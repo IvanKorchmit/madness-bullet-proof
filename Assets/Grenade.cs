@@ -12,7 +12,6 @@ public class Grenade : MonoBehaviour, IHitter
     // Start is called before the first frame update
     void Start()
     {
-        GetComponent<Rigidbody2D>().velocity = (transform.up + transform.right) * 10f;
         TimerUtils.AddTimer(5, Explode);
     }
 

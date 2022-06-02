@@ -61,7 +61,7 @@ public class Player : Entity
     private void ThrowGrenade()
     {
         var gren = Instantiate(grenadePrefab, transform.position, Quaternion.identity);
-
+        gren.GetComponent<Rigidbody2D>().velocity = ((Vector2)transform.up + (Visuals.flipX ? Vector2.left : Vector2.right)) * 10f;
     }
     protected override void Update()
     {
