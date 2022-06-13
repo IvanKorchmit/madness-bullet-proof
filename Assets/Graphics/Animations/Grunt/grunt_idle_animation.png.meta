@@ -39,6 +39,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -232,6 +233,12 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      grunt_idle_animation_0: 68001707650335963
+      grunt_idle_animation_1: -5031648758407848178
+      grunt_idle_animation_2: -918848082132636050
+      grunt_idle_animation_4: -4936797222022183539
+      grunt_idle_animation_3: 5032304566419916187
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

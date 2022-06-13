@@ -42,6 +42,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -256,6 +257,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      grunt_punch_animation_0: -8118073118263971394
+      grunt_punch_animation_5: 3383664602169832333
+      grunt_punch_animation_2: -1808242213381464458
+      grunt_punch_animation_3: -4017673567013141630
+      grunt_punch_animation_4: 3618581455434818922
+      grunt_punch_animation_1: -3416489144858405646
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
