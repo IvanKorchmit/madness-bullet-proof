@@ -4,30 +4,27 @@ public class Enemy : Entity
 {
     private float airTime;
     private int shoots;
-    private bool canJump;
     private bool hasSpotted;
     [SerializeField] private float spotDistance;
     private float patrolDirection;
 
     private LineOfSight los;
+    [field: SerializeField] public override bool IsUndamagable { get; set; }
 
-    protected override void FixedUpdate() => base.FixedUpdate();
     protected override void Start()
     {
         base.Start();
-        onEntityLand += Enemy_onEntityLand;
-        onEntityPunch += ()=> shoots++;
-        onEntityAttack += ()=> shoots++;
-        canJump = true;
+        Stamina = 3;
+        OnEntityLand += Enemy_onEntityLand;
+        OnEntityAttack += ()=> shoots++;
         SetRandomPatrol();
         los = GetComponent<LineOfSight>();
         los.onPlayerSpot += ()=> hasSpotted = true;
-        speed *= Random.Range(0.8f, 1.8f);
-        Ammo = 25;
+        Speed *= Random.Range(0.8f, 1.8f);
+        CurrentWeapon.Ammo = 25;
     }
     private void Enemy_onEntityLand()
     {
-        canJump = true;
         if (airTime > 4f)
         {
             Damage(this, (int)airTime / 4);
@@ -42,76 +39,37 @@ public class Enemy : Entity
     }
     protected override void Update()
     {
-        Player target = Player.Singleton;
         base.Update();
-        if (!Controller.IsGrounded)
+        var p = Player.Singleton;
+        Move(!hasSpotted || p == null ? patrolDirection : (p.transform.position - transform.position).normalized.x);
+        if (hasSpotted && p != null && p.transform.position.y > transform.position.y + 10)
         {
-            airTime += Time.deltaTime;
+            if (p.transform.position.y > transform.position.y + 10)
+            {
+                Jump();
+            }
+            TimerUtils.AddTimer(CurrentWeapon.Base.Cooldown, CurrentWeapon.Use);
         }
-        if (target == null)
+        if (Stamina <= 0)
         {
-            Move(patrolDirection);
-            return;
-        }
-        TryJump(target);
-        TryMove(target);
-        if (CanAttack() && hasSpotted)
-        {
-            if (CurrentWeapon is Firearm)
-            {
-                Attack();
-            }
-            else if ((CurrentWeapon == null || CurrentWeapon is Melee) && Vector2.Distance(Player.Singleton.transform.position, transform.position) <= spotDistance / 10)
-            {
-                Attack();
-            }
-        }
-
-        void TryJump(Player target)
-        {
-            
-            if (hasSpotted && canJump && !IsMoving && target.transform.position.y > transform.position.y + 5f)
-            {
-                Jump(true);
-                canJump = false;
-            }
-            else if (hasSpotted && canJump && !IsMoving && target.transform.position.y < transform.position.y)
-            {
-                JumpOff();
-            }
-            else
-            {
-                Jump(false);
-            }
-        }
-
-        void TryMove(Player target)
-        {
-            if (hasSpotted)
-            {
-                Move(transform.position.x >= target.transform.position.x ? -1f : 1f);
-                Aim(-(transform.position - target.transform.position).normalized);
-            }
-            else
-            {
-                Move(patrolDirection);
-                Aim(new Vector2(patrolDirection, 0));
-            }
+            KO();
         }
     }
-    private bool CanAttack()
+
+    public override bool Damage(IHitter damager, int damage)
     {
-        if (Vector2.Distance(Player.Singleton.transform.position, transform.position) <= spotDistance)
-        {
-            if (shoots < 3)
-            {
-                return true;
-            }
-            else
-            {
-                TimerUtils.AddTimer(1f, ()=> shoots = 0);
-            }
-        }
-        return false;
+        
+        if (IsUndamagable && EntityAnimator.GetBool(IS_KNOCKED_OUT)) return false;
+        Visuals.flipX = damager.transform.position.x > transform.position.x;
+        CanMove = false;
+        EntityAnimator.SetTrigger(STUN_TRIGGER);
+        Stamina -= damage;
+        Health -= damage;
+        return true;
+    }
+
+    public override void InstantKill()
+    {
+        throw new System.NotImplementedException();
     }
 }

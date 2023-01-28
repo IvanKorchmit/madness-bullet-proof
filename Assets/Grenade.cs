@@ -7,7 +7,9 @@ public class Grenade : MonoBehaviour, IHitter
     [SerializeField] private GameObject explosion;
     [SerializeField] private GameObject effector;
     private bool hasAlreadyExplode;
-    public bool IsUndamagable => false;
+
+    public bool IsUndamagable { get => false; set => throw new System.InvalidOperationException(); }
+    public int Health { get; set; } = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -38,7 +40,7 @@ public class Grenade : MonoBehaviour, IHitter
             }
         }
             var eff = Instantiate(effector, transform.position, Quaternion.identity);
-            Object.Destroy(eff, 0.5f);
+            Destroy(eff, 0.5f);
             Instantiate(explosion, transform.position, Quaternion.identity);
         hasAlreadyExplode = true;
         Destroy(gameObject, 0.5f);
@@ -50,7 +52,5 @@ public class Grenade : MonoBehaviour, IHitter
     }
 
     public void InstantKill()
-    {
-        return;
-    }
+    {}
 }

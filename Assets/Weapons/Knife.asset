@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cooldown: 0.333
   sprite: {fileID: 0}
-  shootSound: {fileID: 8300000, guid: 08cdc99a9eab95a4480f9c1d1ff3d394, type: 3}
-  meleeHit: {fileID: 8300000, guid: 08cdc99a9eab95a4480f9c1d1ff3d394, type: 3}
+  attackSound: {fileID: 0}
+  <IsAimable>k__BackingField: 0
+  <Animation>k__BackingField: {fileID: 0}
   meleeSwing: {fileID: 8300000, guid: 88ff6879eabf0c4419f1420cc2e021f2, type: 3}
   damage: 2

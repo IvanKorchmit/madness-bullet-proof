@@ -9,10 +9,9 @@ public class PlayerFollow : MonoBehaviour
     private Vector2 lastPlayerPosition;
     private void Start()
     {
-        Player.Singleton.onEntityLand += Player_onPlayerJumpOrLand;
-        Player.Singleton.onEntityJump += Player_onPlayerJumpOrLand;
-        Player.Singleton.onEntityAttack += Player_onPlayerAttack;
-        Player.Singleton.onEntityPunch += Player_onPlayerAttack;
+        Player.Singleton.OnEntityLand += Player_onPlayerJumpOrLand;
+        Player.Singleton.OnEntityJump += Player_onPlayerJumpOrLand;
+        Player.Singleton.OnEntityAttack += Player_onPlayerAttack;
         lastPlayerPosition = Player.Singleton.transform.position;
     }
 

@@ -16,8 +16,9 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
     public bool undamagable;
     private bool alreadyInRage;
 
-    [SerializeField] private int health = 50;
-    public bool IsUndamagable => undamagable;
+    [field: SerializeField] public bool IsUndamagable { get; set; }
+    [field: SerializeField] public int Health { get; set; } = 50;
+
     private Animator animator;
     [SerializeField] private GameObject projectile;
     [SerializeField] private GameObject missle;
@@ -29,7 +30,7 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
     {
         animator = GetComponent<Animator>();
         GetComponentInChildren<ParticleSystem>().Pause();
-        initHealth = health;
+        initHealth = Health;
 
     }
 
@@ -39,13 +40,13 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
         {
             return false;
         }
-        health -= damage;
-        if (!alreadyInRage && health <= initHealth / 4)
+        Health -= damage;
+        if (!alreadyInRage && Health <= initHealth / 4)
         {
             alreadyInRage = true;
             animator.SetTrigger("Rage");
         }
-        if (health <= 0 && !alreadyDying)
+        if (Health <= 0 && !alreadyDying)
         {
             GetComponentInChildren<ParticleSystem>().Play();
             alreadyDying = true;
@@ -53,7 +54,7 @@ public class BossHelicopter : MonoBehaviour, IDamagable, IHitter
         }
         return true;
     }
-    private void Update() => animator.SetInteger("Health", health);
+    private void Update() => animator.SetInteger("Health", Health);
 
     public void InstantKill() { return; }
 

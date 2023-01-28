@@ -39,6 +39,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -232,6 +233,12 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      grunt_jump_animation_3: -8998380436414844986
+      grunt_jump_animation_0: -6484443249384158584
+      grunt_jump_animation_2: -2261631950032337801
+      grunt_jump_animation_4: 7466564635023601429
+      grunt_jump_animation_1: 4551638600035591731
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

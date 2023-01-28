@@ -7,5 +7,8 @@
     /// <param name="damage">The amount of damage</param>
     bool Damage(IHitter damager, int damage);
     void InstantKill();
-    bool IsUndamagable { get; }
+    bool IsUndamagable { get; set; }
+
+    int Health { get; set; }
+
 }

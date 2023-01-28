@@ -2,27 +2,24 @@
 
 public class Player : Entity
 {
-    [SerializeField] private AudioClip doubleJumpSound;
-    private static Player _instance;
-    public static Player Singleton => _instance;
-    public WeaponBase PlayerWeapon => CurrentWeapon;
-    private int grenades;
-    public int Grenads => grenades;
+    public static Player Singleton { get; private set; }
+    [field:SerializeField] public int Grenads { get; private set; }
+    
+    [field: SerializeField] public override bool IsUndamagable { get; set; }
+
     [SerializeField] private GameObject grenadePrefab;
     protected override void Start()
     {
         base.Start();
         Controller.OnDoubleJumpEvent.AddListener(OnPlayerDoubleJump);
-        onEntityLand += Player_onEntityLand;
-        onEntityWakeUp += () => TimerUtils.AddTimer(1.5f, () => state = FlagUtils.State_Remove(state, EntityState.IsImmune));
-        onEntityKnockout += () => state = FlagUtils.State_Add(state, EntityState.IsImmune);
+        OnEntityLand += Player_onEntityLand;
     }
 
     private void Player_onEntityLand()
     {
         if (RB.velocity.magnitude > 35f)
         {
-            var stomp = Physics2D.CircleCastAll(transform.position, 3f, new Vector2(), 0, meleeLayerMask);
+            var stomp = Physics2D.CircleCastAll(transform.position, 3f, new Vector2(), 0, Melee);
             foreach (var item in stomp)
             {
                 if (item)
@@ -35,28 +32,26 @@ public class Player : Entity
             }
         }
     }
-
+    
     public void SetWeapon(WeaponBase w, int ammo)
     {
-        if (w == CurrentWeapon)
+        if (w == CurrentWeapon.Base)
         {
-            Ammo += ammo;
+            CurrentWeapon.Ammo += ammo;
         }
         else
         {
-            CurrentWeapon = w;
-            Ammo = ammo;
+            CurrentWeapon.SetWeapon(w, ammo);
         }
-        weaponVisuals.enabled = CurrentWeapon != null;
+        WeaponVisuals.enabled = CurrentWeapon != null;
     }
     private void Awake()
     {
-        _instance = this;
+        Singleton = this;
     }
     private void OnPlayerDoubleJump()
     {
-        Audio.PlayOneShot(doubleJumpSound);
-        EntityAnimator.SetTrigger(EntityAnimationConsts.JUMP_TRIGGER);
+        EntityAnimator.SetTrigger(JUMP_TRIGGER);
     }
     private void ThrowGrenade()
     {
@@ -66,11 +61,16 @@ public class Player : Entity
     protected override void Update()
     {
         base.Update();
-        BasicMovement();
+        Move(Input.GetAxisRaw("Horizontal"));
+        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift)) JumpOff();
+        if (!Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
+        }
+
         Aim(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
         Attack();
         Interact();
-        #region Local Funcs
 
         void Interact()
         {
@@ -85,23 +85,20 @@ public class Player : Entity
             }
         }
 
-        void BasicMovement()
-        {
-            Move(Input.GetAxisRaw("Horizontal"));
-            Jump(Input.GetKeyDown(KeyCode.Space) && !Input.GetKey(KeyCode.LeftShift));
-            if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift)) JumpOff();
-            Crounch(Input.GetKey(KeyCode.LeftShift));
-        }
-
         void Attack()
         {
-            if (Input.GetKey(KeyCode.Return)) base.Attack();
+            if (Input.GetKey(KeyCode.Return)) TimerUtils.AddTimer(CurrentWeapon.Base.Cooldown, CurrentWeapon.Use);
             if (Input.GetKeyDown(KeyCode.Slash)) ThrowGrenade();
         }
-        #endregion
     }
-    protected override void FixedUpdate()
+
+    public override bool Damage(IHitter damager, int damage)
     {
-        base.FixedUpdate();
+        throw new System.NotImplementedException();
+    }
+
+    public override void InstantKill()
+    {
+        throw new System.NotImplementedException();
     }
 }

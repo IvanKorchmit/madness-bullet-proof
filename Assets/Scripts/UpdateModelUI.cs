@@ -11,7 +11,7 @@ public class UpdateModelUI : MonoBehaviour
         if (p == null) return;
         foreach (WeaponAndModel item in weaponModels)
         {
-            item.model.gameObject.SetActive(p.PlayerWeapon == item.weapon);
+            item.model.gameObject.SetActive(p.WeaponBase == item.weapon);
         }
     }
 }

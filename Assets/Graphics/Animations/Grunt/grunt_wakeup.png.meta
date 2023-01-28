@@ -39,6 +39,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -232,6 +233,12 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      grunt_wakeup_0: 1482864527765983669
+      grunt_wakeup_1: -416530829179137698
+      grunt_wakeup_4: -4390288927503431155
+      grunt_wakeup_2: -2921192815969303850
+      grunt_wakeup_3: -2563240941814108226
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

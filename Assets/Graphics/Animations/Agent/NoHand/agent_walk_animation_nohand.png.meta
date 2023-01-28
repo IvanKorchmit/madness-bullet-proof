@@ -48,6 +48,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -316,6 +317,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      agent_walk_animation_nohand_1: 1741103070190114246
+      agent_walk_animation_nohand_7: -7488292733791576787
+      agent_walk_animation_nohand_0: -8082003271013262381
+      agent_walk_animation_nohand_4: 4153989567374007845
+      agent_walk_animation_nohand_3: -7554496323483515849
+      agent_walk_animation_nohand_5: -2761387867958548437
+      agent_walk_animation_nohand_6: 3008988244965966163
+      agent_walk_animation_nohand_2: -786740507608074106
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

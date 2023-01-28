@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cooldown: 0.1
   sprite: {fileID: 21300000, guid: 6edd56146b2df384898c6b9bbdd55b9d, type: 3}
-  shootSound: {fileID: 8300000, guid: 1f1ae1f57e9e28c41a31cfc0c355c445, type: 3}
+  attackSound: {fileID: 0}
+  <IsAimable>k__BackingField: 1
+  <Animation>k__BackingField: {fileID: 0}
   projectilePrefab: {fileID: 6081967461690896097, guid: 3a90c5e9cd48a2e449a1235b613db757, type: 3}

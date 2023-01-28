@@ -19,7 +19,9 @@ public class NoWakingUpParam : StateMachineBehaviour
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.GetComponent<Entity>().UnlockMovement();
+        Entity entity = animator.GetComponent<Entity>();
+        entity.OnWakeUp();
+        
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

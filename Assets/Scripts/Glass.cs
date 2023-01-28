@@ -7,7 +7,10 @@ public class Glass : MonoBehaviour, IDamagable
     [SerializeField] private GameObject glassShards;
     private BoxCollider2D boxCollider;
     private bool isBroken;
-    public bool IsUndamagable => false;
+
+    public bool IsUndamagable { get; set; } = false;
+    public int Health { get; set; } = 0; 
+
     public void InstantKill()
     {
         Break();
@@ -33,7 +36,7 @@ public class Glass : MonoBehaviour, IDamagable
         src.transform.SetParent(null);
         src.Play();
         Instantiate(glassShards, transform.position, Quaternion.identity);
-        Object.Destroy(src.gameObject, src.clip.length);
+        Destroy(src.gameObject, src.clip.length);
         Destroy(gameObject, src.clip.length);
         gameObject.SetActive(false);
         isBroken = true;

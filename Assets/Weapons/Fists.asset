@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a42528dfde0f34a48adea789a1fa9f2e, type: 3}
+  m_Name: Fists
+  m_EditorClassIdentifier: 
+  cooldown: 0.5
+  sprite: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: 69713b2f504ced3439dbeac9a58c1cbd, type: 3}
+  <IsAimable>k__BackingField: 0
+  <Animation>k__BackingField: {fileID: 9100000, guid: 4abc02994f1342044a88b1e1676f6817, type: 2}
+  meleeSwing: {fileID: 8300000, guid: 88ff6879eabf0c4419f1420cc2e021f2, type: 3}
+  damage: 2

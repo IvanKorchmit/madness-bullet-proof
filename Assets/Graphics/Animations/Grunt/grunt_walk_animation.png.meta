@@ -48,6 +48,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -304,6 +305,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      grunt_walk_animation_7: -3659191666156493795
+      grunt_walk_animation_3: -3452592533166725259
+      grunt_walk_animation_1: -1458128485357700207
+      grunt_walk_animation_5: 1038082350960991842
+      grunt_walk_animation_2: 4577592704426539132
+      grunt_walk_animation_0: 1523846908972222348
+      grunt_walk_animation_6: 8662261509148217043
+      grunt_walk_animation_4: 879180245390613769
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
